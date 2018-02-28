@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetDialogFragment;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,14 +22,34 @@ import android.view.ViewGroup;
 
 public class ImagePickerSheetDialog extends BottomSheetDialogFragment {
 
+    //Views
+    RecyclerView recyclerView;
+
+
+    //Adapter
+    ImageTileAdapter adapter;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.layout_picker_sheet, container, false);
+        bindViews(view);
 
-
+        setupRecyclerView();
 
         return view;
+    }
+
+    private void bindViews (View rootView) {
+        recyclerView = rootView.findViewById(R.id.picker_recyclerview);
+    }
+
+    private void setupRecyclerView () {
+        GridLayoutManager gll = new GridLayoutManager(getContext(), 3);
+        recyclerView.setLayoutManager(gll);
+        recyclerView.addItemDecoration(new GridItemSpacingDecoration(3, 5, false));
+        adapter = new ImageTileAdapter(getContext());
+        recyclerView.setAdapter(adapter);
     }
 
     /**
@@ -38,5 +60,4 @@ public class ImagePickerSheetDialog extends BottomSheetDialogFragment {
 
 
     }
-
 }
