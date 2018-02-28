@@ -4,6 +4,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 
+import com.asksira.imagerpickersheet.ImagePickerSheetDialog;
+
 public class MainActivity extends AppCompatActivity {
 
     @Override
@@ -14,7 +16,8 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.entrance).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                
+                ImagePickerSheetDialog pickerDialog = new ImagePickerSheetDialog();
+                pickerDialog.show(getSupportFragmentManager(), "picker");
             }
         });
     }
