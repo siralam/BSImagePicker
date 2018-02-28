@@ -9,6 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
 /**
  * This is the core class of this library, which extends BottomSheetDialogFragment
@@ -40,6 +41,12 @@ public class ImagePickerSheetDialog extends BottomSheetDialogFragment {
         return view;
     }
 
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        setupBottomBar(getView());
+    }
+
     private void bindViews (View rootView) {
         recyclerView = rootView.findViewById(R.id.picker_recyclerview);
     }
@@ -50,6 +57,11 @@ public class ImagePickerSheetDialog extends BottomSheetDialogFragment {
         recyclerView.addItemDecoration(new GridItemSpacingDecoration(3, 5, false));
         adapter = new ImageTileAdapter(getContext());
         recyclerView.setAdapter(adapter);
+    }
+
+    private void setupBottomBar (View rootView) {
+        FrameLayout parentView = (FrameLayout)(rootView.getParent().getParent().getParent());
+        parentView.addView(LayoutInflater.from(getContext()).inflate(R.layout.item_selection_bar, parentView, false), -1);
     }
 
     /**
