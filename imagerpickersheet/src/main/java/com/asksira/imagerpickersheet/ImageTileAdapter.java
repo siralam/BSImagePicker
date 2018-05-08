@@ -25,6 +25,9 @@ public class ImageTileAdapter extends RecyclerView.Adapter<ImageTileAdapter.Base
     protected Context context;
     protected List<File> imageList;
 
+    private View.OnClickListener cameraTileOnClickListener;
+    private View.OnClickListener galleryTileOnClickListener;
+
     public ImageTileAdapter(Context context) {
         super();
         this.context = context;
@@ -69,6 +72,14 @@ public class ImageTileAdapter extends RecyclerView.Adapter<ImageTileAdapter.Base
         notifyDataSetChanged();
     }
 
+    public void setCameraTileOnClickListener(View.OnClickListener cameraTileOnClickListener) {
+        this.cameraTileOnClickListener = cameraTileOnClickListener;
+    }
+
+    public void setGalleryTileOnClickListener(View.OnClickListener galleryTileOnClickListener) {
+        this.galleryTileOnClickListener = galleryTileOnClickListener;
+    }
+
     public abstract static class BaseViewHolder extends RecyclerView.ViewHolder {
 
         public BaseViewHolder(View itemView) {
@@ -83,12 +94,7 @@ public class ImageTileAdapter extends RecyclerView.Adapter<ImageTileAdapter.Base
 
         public CameraTileViewHolder(View itemView) {
             super(itemView);
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    //TODO: Launch Camera Intent
-                }
-            });
+            itemView.setOnClickListener(cameraTileOnClickListener);
         }
 
         @Override
@@ -101,12 +107,7 @@ public class ImageTileAdapter extends RecyclerView.Adapter<ImageTileAdapter.Base
 
         public GalleryTileViewHolder(View itemView) {
             super(itemView);
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    //TODO: Launch Gallery Intent
-                }
-            });
+            itemView.setOnClickListener(galleryTileOnClickListener);
         }
 
         @Override
