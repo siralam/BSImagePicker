@@ -8,20 +8,21 @@ import com.asksira.imagerpickersheet.R;
 
 /**
  * An ImageView that measures itself according to specified aspect ratio.
+ * This does not work if height is match_parent.
  */
 
-public class AspectRatioImageView extends android.support.v7.widget.AppCompatImageView {
+public class FitWidthImageView extends android.support.v7.widget.AppCompatImageView {
 
     /**
      * Aspect ratio is calculated by width / height.
      */
     protected float aspectRatio;
 
-    public AspectRatioImageView(Context context) {
+    public FitWidthImageView(Context context) {
         super(context);
     }
 
-    public AspectRatioImageView(Context context, AttributeSet attrs) {
+    public FitWidthImageView(Context context, AttributeSet attrs) {
         super(context, attrs);
         TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.AspectRatioView, 0, 0);
         try {
@@ -31,7 +32,7 @@ public class AspectRatioImageView extends android.support.v7.widget.AppCompatIma
         }
     }
 
-    public AspectRatioImageView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public FitWidthImageView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
 

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.asksira.imagerpickersheet.widget.AspectRatioImageView
+<com.asksira.imagerpickersheet.widget.FitWidthImageView
     android:id="@+id/item_imageTile"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
@@ -7,4 +7,4 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:view_aspectRatio="1">
 
-</com.asksira.imagerpickersheet.widget.AspectRatioImageView>
+</com.asksira.imagerpickersheet.widget.FitWidthImageView>
