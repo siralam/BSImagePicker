@@ -3,8 +3,10 @@
     android:id="@+id/item_imageTile"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    app:view_aspectRatio="1">
+    app:view_aspectRatio="1"
+    android:scaleType="centerCrop"
+    android:background="@android:color/darker_gray">
 
 </com.asksira.imagerpickersheet.widget.FitWidthImageView>

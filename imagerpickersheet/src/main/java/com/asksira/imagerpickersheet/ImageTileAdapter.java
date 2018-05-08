@@ -1,15 +1,19 @@
 package com.asksira.imagerpickersheet;
 
 import android.content.Context;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
+
+import java.io.File;
+import java.util.List;
+
 /**
- * The RecyclerView's adapter of the selectable image tiles.
+ * The RecyclerView's adapter of the selectable ivImage tiles.
  */
 
 public class ImageTileAdapter extends RecyclerView.Adapter<ImageTileAdapter.BaseViewHolder> {
@@ -19,6 +23,7 @@ public class ImageTileAdapter extends RecyclerView.Adapter<ImageTileAdapter.Base
     private static final int VIEWTYPE_IMAGE = 103;
 
     protected Context context;
+    protected List<File> imageList;
 
     public ImageTileAdapter(Context context) {
         super();
@@ -44,7 +49,7 @@ public class ImageTileAdapter extends RecyclerView.Adapter<ImageTileAdapter.Base
 
     @Override
     public int getItemCount() {
-        return 25;
+        return imageList == null ? 2 : 2 + imageList.size();
     }
 
     @Override
@@ -57,6 +62,11 @@ public class ImageTileAdapter extends RecyclerView.Adapter<ImageTileAdapter.Base
             default:
                 return VIEWTYPE_IMAGE;
         }
+    }
+
+    public void setImageList (List<File> imageList) {
+        this.imageList = imageList;
+        notifyDataSetChanged();
     }
 
     public abstract static class BaseViewHolder extends RecyclerView.ViewHolder {
@@ -107,33 +117,17 @@ public class ImageTileAdapter extends RecyclerView.Adapter<ImageTileAdapter.Base
 
     public class ImageTileViewHolder extends BaseViewHolder {
 
-        ImageView image;
+        ImageView ivImage;
 
         public ImageTileViewHolder(View itemView) {
             super(itemView);
-            image = itemView.findViewById(R.id.item_imageTile);
+            ivImage = itemView.findViewById(R.id.item_imageTile);
         }
 
         public void bind (int position) {
-            image.setBackgroundColor(ContextCompat.getColor(context, getColor(position)));
-        }
-
-        private int getColor (int position) {
-            int remainder = position % 5;
-            switch (remainder) {
-                case 0:
-                    return android.R.color.holo_red_light;
-                case 1:
-                    return android.R.color.holo_orange_light;
-                case 2:
-                    return android.R.color.holo_green_light;
-                case 3:
-                    return android.R.color.holo_blue_light;
-                case 4:
-                    return android.R.color.holo_purple;
-                default:
-                    return android.R.color.black;
-            }
+            if (imageList == null) return;
+            File imageFile = imageList.get(position - 2);
+            Glide.with(itemView).load(imageFile).into(ivImage);
         }
     }
 }
