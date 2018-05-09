@@ -59,6 +59,7 @@ public class ImagePickerSheetDialog extends BottomSheetDialogFragment implements
     private static final int PERMISSION_WRITE_STORAGE = 2003;
 
     private static final int REQUEST_TAKE_PHOTO = 3001;
+    private static final int REQUEST_SELECT_FROM_GALLERY = 3002;
 
     //Views
     private RecyclerView recyclerView;
@@ -212,6 +213,13 @@ public class ImagePickerSheetDialog extends BottomSheetDialogFragment implements
                     }
                 }
                 break;
+            case REQUEST_SELECT_FROM_GALLERY:
+                if (resultCode == RESULT_OK) {
+                    if (onSingleImageSelectedListener != null) {
+                        onSingleImageSelectedListener.onSingleImageSelected(data.getData());
+                        dismiss();
+                    }
+                }
             default:
                 super.onActivityResult(requestCode, resultCode, data);
         }
@@ -279,6 +287,13 @@ public class ImagePickerSheetDialog extends BottomSheetDialogFragment implements
                         Utils.checkPermission(ImagePickerSheetDialog.this, Manifest.permission.CAMERA, PERMISSION_CAMERA);
                     }
                 }
+            }
+        });
+        adapter.setGalleryTileOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(intent, REQUEST_SELECT_FROM_GALLERY);
             }
         });
         recyclerView.setAdapter(adapter);
