@@ -23,6 +23,7 @@ public class ImageTileAdapter extends RecyclerView.Adapter<ImageTileAdapter.Base
     private static final int VIEWTYPE_CAMERA = 101;
     private static final int VIEWTYPE_GALLERY = 102;
     private static final int VIEWTYPE_IMAGE = 103;
+    private static final int VIEWTYPE_DUMMY = 104;
 
     protected Context context;
     protected List<File> imageList;
@@ -58,6 +59,8 @@ public class ImageTileAdapter extends RecyclerView.Adapter<ImageTileAdapter.Base
                 return new CameraTileViewHolder(LayoutInflater.from(context).inflate(R.layout.item_camera_tile, parent, false));
             case VIEWTYPE_GALLERY:
                 return new GalleryTileViewHolder(LayoutInflater.from(context).inflate(R.layout.item_gallery_tile, parent, false));
+            case VIEWTYPE_DUMMY:
+                return new DummyViewHolder(LayoutInflater.from(context).inflate(R.layout.item_dummy_tile, parent, false));
             default:
                 return new ImageTileViewHolder(LayoutInflater.from(context).inflate(R.layout.item_image_tile, parent, false));
         }
@@ -71,21 +74,25 @@ public class ImageTileAdapter extends RecyclerView.Adapter<ImageTileAdapter.Base
     @Override
     public int getItemCount() {
         if (!isMultiSelect) {
-            return imageList == null ? 2 : 2 + imageList.size();
+            return imageList == null ? 16 : 2 + imageList.size();
         } else {
-            return imageList == null ? 0 : imageList.size();
+            return imageList == null ? 16 : imageList.size();
         }
     }
 
     @Override
     public int getItemViewType(int position) {
-        switch (position) {
-            case 0:
-                return isMultiSelect ? VIEWTYPE_IMAGE : VIEWTYPE_CAMERA;
-            case 1:
-                return isMultiSelect ? VIEWTYPE_IMAGE : VIEWTYPE_GALLERY;
-            default:
-                return VIEWTYPE_IMAGE;
+        if (!isMultiSelect) {
+            switch (position) {
+                case 0:
+                    return VIEWTYPE_CAMERA;
+                case 1:
+                    return VIEWTYPE_GALLERY;
+                default:
+                    return imageList == null ? VIEWTYPE_DUMMY : VIEWTYPE_IMAGE;
+            }
+        } else {
+            return imageList == null ? VIEWTYPE_DUMMY : VIEWTYPE_IMAGE;
         }
     }
 
@@ -206,6 +213,19 @@ public class ImageTileAdapter extends RecyclerView.Adapter<ImageTileAdapter.Base
             Glide.with(itemView).load(imageFile).into(ivImage);
             darken.setVisibility(selectedFiles.contains(imageFile)? View.VISIBLE : View.INVISIBLE);
             ivTick.setVisibility(selectedFiles.contains(imageFile)? View.VISIBLE : View.INVISIBLE);
+        }
+    }
+
+    public class DummyViewHolder extends BaseViewHolder {
+
+
+        public DummyViewHolder(View itemView) {
+            super(itemView);
+        }
+
+        @Override
+        public void bind(int position) {
+
         }
     }
 }

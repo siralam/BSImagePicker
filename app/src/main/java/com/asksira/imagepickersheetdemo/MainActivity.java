@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity implements ImagePickerSheetD
             @Override
             public void onClick(View v) {
                 ImagePickerSheetDialog pickerDialog = new ImagePickerSheetDialog.Builder("com.asksira.imagepickersheetdemo.fileprovider")
-                        .setMaximumDisplayingImages(200)
+                        .setMaximumDisplayingImages(Integer.MAX_VALUE)
                         .isMultiSelect()
                         .setMinimumMultiSelectCount(3)
                         .setMaximumMultiSelectCount(6)
@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity implements ImagePickerSheetD
 
     @Override
     public void onSingleImageSelected(Uri uri) {
-        Glide.with(MainActivity.this).load(uri).into(ivImage1);
+        Glide.with(MainActivity.this).load(uri).into(ivImage2);
     }
 
     @Override

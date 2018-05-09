@@ -63,7 +63,6 @@ public class ImagePickerSheetDialog extends BottomSheetDialogFragment implements
 
     private static final int REQUEST_TAKE_PHOTO = 3001;
     private static final int REQUEST_SELECT_FROM_GALLERY = 3002;
-    private static final int REQUEST_SELECT_FROM_GALLERY_MULTIPLE = 3003;
 
     //Views
     private RecyclerView recyclerView;
@@ -90,7 +89,7 @@ public class ImagePickerSheetDialog extends BottomSheetDialogFragment implements
     private Uri currentPhotoUri;
 
     //Configurations
-    private int maximumDisplayingImages = 50;
+    private int maximumDisplayingImages = Integer.MAX_VALUE;
     private int peekHeight = Utils.dp2px(360);
     private int minimumMultiSelectCount = 1;
     private int maximumMultiSelectCount = Integer.MAX_VALUE;
@@ -356,7 +355,9 @@ public class ImagePickerSheetDialog extends BottomSheetDialogFragment implements
         ViewCompat.setTranslationZ(bottomBarView, ViewCompat.getZ((View) rootView.getParent()));
         parentView.addView(bottomBarView, -1);
         tvMultiSelectMessage = bottomBarView.findViewById(R.id.tv_multiselect_message);
-        tvMultiSelectMessage.setText(getString(R.string.imagepicker_multiselect_not_enough_singular));
+        tvMultiSelectMessage.setText(minimumMultiSelectCount == 1 ?
+                getString(R.string.imagepicker_multiselect_not_enough_singular) :
+                getString(R.string.imagepicker_multiselect_not_enough_plural, minimumMultiSelectCount));
         tvDone = bottomBarView.findViewById(R.id.tv_multiselect_done);
         tvDone.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -448,7 +449,7 @@ public class ImagePickerSheetDialog extends BottomSheetDialogFragment implements
 
         private String providerAuthority;
         private boolean isMultiSelect;
-        private int maximumDisplayingImages = 50;
+        private int maximumDisplayingImages = Integer.MAX_VALUE;
         private int minimumMultiSelectCount = 1;
         private int maximumMultiSelectCount = Integer.MAX_VALUE;
 
