@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">ImagePickerSheetDemo</string>
+    <string name="imagepicker_multiselect_done">搞店</string>
+    <string name="imagepicker_multiselect_not_enough_singular">要揀多一張相</string>
+    <string name="imagepicker_multiselect_not_enough_plural">要揀多%d張相</string>
+    <string name="imagepicker_multiselect_enough_singular">你揀左1張相</string>
+    <string name="imagepicker_multiselect_enough_plural">你揀左%d張相</string>
+    <string name="imagepicker_multiselect_overselect">頂你！唔可以揀多過%d張相呀</string>
 </resources>

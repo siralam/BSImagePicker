@@ -63,6 +63,7 @@ public class ImagePickerSheetDialog extends BottomSheetDialogFragment implements
 
     private static final int REQUEST_TAKE_PHOTO = 3001;
     private static final int REQUEST_SELECT_FROM_GALLERY = 3002;
+    private static final int REQUEST_SELECT_FROM_GALLERY_MULTIPLE = 3003;
 
     //Views
     private RecyclerView recyclerView;
@@ -234,6 +235,7 @@ public class ImagePickerSheetDialog extends BottomSheetDialogFragment implements
                         dismiss();
                     }
                 }
+                break;
             default:
                 super.onActivityResult(requestCode, resultCode, data);
         }
@@ -315,8 +317,10 @@ public class ImagePickerSheetDialog extends BottomSheetDialogFragment implements
             adapter.setGalleryTileOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                    startActivityForResult(intent, REQUEST_SELECT_FROM_GALLERY);
+                    if (!isMultiSelection) {
+                        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                        startActivityForResult(intent, REQUEST_SELECT_FROM_GALLERY);
+                    }
                 }
             });
             adapter.setImageTileOnClickListener(new View.OnClickListener() {

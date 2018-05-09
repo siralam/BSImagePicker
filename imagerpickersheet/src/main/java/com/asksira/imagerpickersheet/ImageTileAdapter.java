@@ -73,7 +73,7 @@ public class ImageTileAdapter extends RecyclerView.Adapter<ImageTileAdapter.Base
         if (!isMultiSelect) {
             return imageList == null ? 2 : 2 + imageList.size();
         } else {
-            return imageList == null ? 1 : 1 + imageList.size();
+            return imageList == null ? 0 : imageList.size();
         }
     }
 
@@ -81,7 +81,7 @@ public class ImageTileAdapter extends RecyclerView.Adapter<ImageTileAdapter.Base
     public int getItemViewType(int position) {
         switch (position) {
             case 0:
-                return isMultiSelect ? VIEWTYPE_GALLERY : VIEWTYPE_CAMERA;
+                return isMultiSelect ? VIEWTYPE_IMAGE : VIEWTYPE_CAMERA;
             case 1:
                 return isMultiSelect ? VIEWTYPE_IMAGE : VIEWTYPE_GALLERY;
             default:
@@ -178,7 +178,7 @@ public class ImageTileAdapter extends RecyclerView.Adapter<ImageTileAdapter.Base
                 itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        File thisFile = imageList.get(getAdapterPosition() - 1);
+                        File thisFile = imageList.get(getAdapterPosition());
                         if (selectedFiles.contains(thisFile)) {
                             selectedFiles.remove(thisFile);
                             notifyItemChanged(getAdapterPosition());
@@ -201,7 +201,7 @@ public class ImageTileAdapter extends RecyclerView.Adapter<ImageTileAdapter.Base
 
         public void bind (int position) {
             if (imageList == null) return;
-            File imageFile = imageList.get(position - (isMultiSelect ? 1 : 2));
+            File imageFile = imageList.get(position - (isMultiSelect ? 0 : 2));
             itemView.setTag(Uri.fromFile(imageFile));
             Glide.with(itemView).load(imageFile).into(ivImage);
             darken.setVisibility(selectedFiles.contains(imageFile)? View.VISIBLE : View.INVISIBLE);
