@@ -11,8 +11,10 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.annotation.ColorRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.Px;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.BottomSheetDialogFragment;
@@ -94,6 +96,19 @@ public class ImagePickerSheetDialog extends BottomSheetDialogFragment implements
     private int minimumMultiSelectCount = 1;
     private int maximumMultiSelectCount = Integer.MAX_VALUE;
     private String providerAuthority;
+    private int cameraTileBgColor = android.R.color.black;
+    private int galleryTileBgColor = android.R.color.darker_gray;
+    private int cameraTileIcon = R.drawable.picker_icon_camera;
+    private int galleryTileIcon = R.drawable.picker_icon_gallery;
+    private boolean showCameraTile = true;
+    private boolean showGalleryTile = true;
+    private int spanCount = 3;
+    private int gridSpacing = Utils.dp2px(2);
+    private int multiSelectBarBgColor = android.R.color.white;
+    private int multiSelectTextColor = R.color.primary_text;
+    private int multiSelectDoneTextColor = R.color.multiselect_done;
+    private boolean showOverSelectMessage = true;
+    private int overSelectTextColor = R.color.error_text;
 
     @Override
     public void onAttach(Context context) {
@@ -123,7 +138,7 @@ public class ImagePickerSheetDialog extends BottomSheetDialogFragment implements
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.layout_picker_sheet, container, false);
+        View view = inflater.inflate(R.layout.layout_imagepicker_sheet, container, false);
         bindViews(view);
         setupRecyclerView();
         return view;
@@ -293,10 +308,6 @@ public class ImagePickerSheetDialog extends BottomSheetDialogFragment implements
         adapter.setImageList(null);
     }
 
-    private void bindViews(View rootView) {
-        recyclerView = rootView.findViewById(R.id.picker_recyclerview);
-    }
-
     private void loadConfigFromBuilder() {
         try {
             providerAuthority = getArguments().getString("providerAuthority");
@@ -304,9 +315,15 @@ public class ImagePickerSheetDialog extends BottomSheetDialogFragment implements
             maximumDisplayingImages = getArguments().getInt("maximumDisplayingImages");
             minimumMultiSelectCount = getArguments().getInt("minimumMultiSelectCount");
             maximumMultiSelectCount = getArguments().getInt("maximumMultiSelectCount");
+            showCameraTile = getArguments().getBoolean("showCameraTile");
+            showGalleryTile = getArguments().getBoolean("showGalleryTile");
         } catch (Exception e) {
             if (BuildConfig.DEBUG) e.printStackTrace();
         }
+    }
+
+    private void bindViews(View rootView) {
+        recyclerView = rootView.findViewById(R.id.picker_recyclerview);
     }
 
     private void setupRecyclerView() {
@@ -317,7 +334,7 @@ public class ImagePickerSheetDialog extends BottomSheetDialogFragment implements
         ((SimpleItemAnimator)recyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
         recyclerView.addItemDecoration(new GridItemSpacingDecoration(3, Utils.dp2px(2), false));
         if (adapter == null) {
-            adapter = new ImageTileAdapter(getContext(), isMultiSelection);
+            adapter = new ImageTileAdapter(getContext(), isMultiSelection, showCameraTile, showGalleryTile);
             adapter.setMaximumSelectionCount(maximumMultiSelectCount);
             adapter.setCameraTileOnClickListener(new View.OnClickListener() {
                 @Override
@@ -371,7 +388,7 @@ public class ImagePickerSheetDialog extends BottomSheetDialogFragment implements
 
     private void setupBottomBar(View rootView) {
         CoordinatorLayout parentView = (CoordinatorLayout) (rootView.getParent().getParent());
-        bottomBarView = LayoutInflater.from(getContext()).inflate(R.layout.item_selection_bar, parentView, false);
+        bottomBarView = LayoutInflater.from(getContext()).inflate(R.layout.item_picker_multiselection_bar, parentView, false);
         ViewCompat.setTranslationZ(bottomBarView, ViewCompat.getZ((View) rootView.getParent()));
         parentView.addView(bottomBarView, -1);
         tvMultiSelectMessage = bottomBarView.findViewById(R.id.tv_multiselect_message);
@@ -472,6 +489,16 @@ public class ImagePickerSheetDialog extends BottomSheetDialogFragment implements
         private int maximumDisplayingImages = Integer.MAX_VALUE;
         private int minimumMultiSelectCount = 1;
         private int maximumMultiSelectCount = Integer.MAX_VALUE;
+        private boolean showCameraTile = true;
+        private boolean showGalleryTile = true;
+        private int peekHeight = Utils.dp2px(360);
+        private int spanCount = 3;
+        private int gridSpacing = Utils.dp2px(2);
+        private int multiSelectBarBgColor = android.R.color.white;
+        private int multiSelectTextColor = R.color.primary_text;
+        private int multiSelectDoneTextColor = R.color.multiselect_done;
+        private boolean showOverSelectMessage = true;
+        private int overSelectTextColor = R.color.error_text;
 
         public Builder(String providerAuthority) {
             this.providerAuthority = providerAuthority;
@@ -497,6 +524,56 @@ public class ImagePickerSheetDialog extends BottomSheetDialogFragment implements
             return this;
         }
 
+        public Builder setGridSpacing(@Px int gridSpacing) {
+            this.gridSpacing = gridSpacing;
+            return this;
+        }
+
+        public Builder setMultiSelectBarBgColor(@ColorRes int multiSelectBarBgColor) {
+            this.multiSelectBarBgColor = multiSelectBarBgColor;
+            return this;
+        }
+
+        public Builder setMultiSelectDoneTextColor(@ColorRes int multiSelectDoneTextColor) {
+            this.multiSelectDoneTextColor = multiSelectDoneTextColor;
+            return this;
+        }
+
+        public Builder setMultiSelectTextColor(@ColorRes int multiSelectTextColor) {
+            this.multiSelectTextColor = multiSelectTextColor;
+            return this;
+        }
+
+        public Builder setOverSelectTextColor(@ColorRes int overSelectTextColor) {
+            this.overSelectTextColor = overSelectTextColor;
+            return this;
+        }
+
+        public Builder setPeekHeight(@Px int peekHeight) {
+            this.peekHeight = peekHeight;
+            return this;
+        }
+
+        public Builder hideCameraTile() {
+            this.showCameraTile = false;
+            return this;
+        }
+
+        public Builder hideGalleryTile() {
+            this.showGalleryTile = false;
+            return this;
+        }
+
+        public Builder disableOverSelectionMessage () {
+            this.showOverSelectMessage = false;
+            return this;
+        }
+
+        public Builder setSpanCount(int spanCount) {
+            this.spanCount = spanCount;
+            return this;
+        }
+
         public ImagePickerSheetDialog build() {
             Bundle args = new Bundle();
             args.putString("providerAuthority", providerAuthority);
@@ -504,7 +581,16 @@ public class ImagePickerSheetDialog extends BottomSheetDialogFragment implements
             args.putInt("maximumDisplayingImages", maximumDisplayingImages);
             args.putInt("minimumMultiSelectCount", minimumMultiSelectCount);
             args.putInt("maximumMultiSelectCount", maximumMultiSelectCount);
-
+            args.putBoolean("showCameraTile", showCameraTile);
+            args.putBoolean("showGalleryTile", showGalleryTile);
+            args.putInt("peekHeight", peekHeight);
+            args.putInt("spanCount", spanCount);
+            args.putInt("gridSpacing", gridSpacing);
+            args.putInt("multiSelectBarBgColor", multiSelectBarBgColor);
+            args.putInt("multiSelectTextColor", multiSelectTextColor);
+            args.putInt("multiSelectDoneTextColor", multiSelectDoneTextColor);
+            args.putBoolean("showOverSelectMessage", showOverSelectMessage);
+            args.putInt("overSelectTextColor", overSelectTextColor);
 
             ImagePickerSheetDialog fragment = new ImagePickerSheetDialog();
             fragment.setArguments(args);

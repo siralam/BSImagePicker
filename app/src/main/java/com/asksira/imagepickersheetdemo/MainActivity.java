@@ -31,6 +31,8 @@ public class MainActivity extends AppCompatActivity implements ImagePickerSheetD
             public void onClick(View v) {
                 ImagePickerSheetDialog pickerDialog = new ImagePickerSheetDialog.Builder("com.asksira.imagepickersheetdemo.fileprovider")
                         .setMaximumDisplayingImages(Integer.MAX_VALUE)
+                        .hideCameraTile()
+                        .hideGalleryTile()
                         .build();
                 pickerDialog.show(getSupportFragmentManager(), "picker");
             }

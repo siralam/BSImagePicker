@@ -22,7 +22,7 @@
         android:id="@+id/imageTile_selected"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/selected"
+        android:src="@drawable/picker_tile_selected"
         android:layout_centerInParent="true"/>
 
 </com.asksira.imagerpickersheet.widget.FitWidthRelativeLayout>

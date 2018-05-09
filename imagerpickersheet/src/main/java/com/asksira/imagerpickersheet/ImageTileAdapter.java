@@ -30,6 +30,9 @@ public class ImageTileAdapter extends RecyclerView.Adapter<ImageTileAdapter.Base
     protected boolean isMultiSelect;
     protected List<File> selectedFiles;
     protected int maximumSelectionCount = Integer.MAX_VALUE;
+    protected int nonListItemCount;
+    private boolean showCameraTile = true;
+    private boolean showGalleryTile = true;
 
     private View.OnClickListener cameraTileOnClickListener;
     private View.OnClickListener galleryTileOnClickListener;
@@ -45,24 +48,37 @@ public class ImageTileAdapter extends RecyclerView.Adapter<ImageTileAdapter.Base
     }
     private OnOverSelectListener onOverSelectListener;
 
-    public ImageTileAdapter(Context context, boolean isMultiSelect) {
+    public ImageTileAdapter(Context context, boolean isMultiSelect, boolean showCameraTile, boolean showGalleryTile) {
         super();
         this.context = context;
         this.isMultiSelect = isMultiSelect;
         selectedFiles = new ArrayList<>();
+        this.showCameraTile = showCameraTile;
+        this.showGalleryTile = showGalleryTile;
+        if (isMultiSelect) {
+            nonListItemCount = 0;
+        } else {
+            if (showCameraTile && showGalleryTile) {
+                nonListItemCount = 2;
+            } else if (showCameraTile || showGalleryTile) {
+                nonListItemCount = 1;
+            } else {
+                nonListItemCount = 0;
+            }
+        }
     }
 
     @Override
     public ImageTileAdapter.BaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         switch (viewType) {
             case VIEWTYPE_CAMERA:
-                return new CameraTileViewHolder(LayoutInflater.from(context).inflate(R.layout.item_camera_tile, parent, false));
+                return new CameraTileViewHolder(LayoutInflater.from(context).inflate(R.layout.item_picker_camera_tile, parent, false));
             case VIEWTYPE_GALLERY:
-                return new GalleryTileViewHolder(LayoutInflater.from(context).inflate(R.layout.item_gallery_tile, parent, false));
+                return new GalleryTileViewHolder(LayoutInflater.from(context).inflate(R.layout.item_picker_gallery_tile, parent, false));
             case VIEWTYPE_DUMMY:
-                return new DummyViewHolder(LayoutInflater.from(context).inflate(R.layout.item_dummy_tile, parent, false));
+                return new DummyViewHolder(LayoutInflater.from(context).inflate(R.layout.item_picker_dummy_tile, parent, false));
             default:
-                return new ImageTileViewHolder(LayoutInflater.from(context).inflate(R.layout.item_image_tile, parent, false));
+                return new ImageTileViewHolder(LayoutInflater.from(context).inflate(R.layout.item_picker_image_tile, parent, false));
         }
     }
 
@@ -74,7 +90,7 @@ public class ImageTileAdapter extends RecyclerView.Adapter<ImageTileAdapter.Base
     @Override
     public int getItemCount() {
         if (!isMultiSelect) {
-            return imageList == null ? 16 : 2 + imageList.size();
+            return imageList == null ? 16 : nonListItemCount + imageList.size();
         } else {
             return imageList == null ? 16 : imageList.size();
         }
@@ -85,9 +101,15 @@ public class ImageTileAdapter extends RecyclerView.Adapter<ImageTileAdapter.Base
         if (!isMultiSelect) {
             switch (position) {
                 case 0:
-                    return VIEWTYPE_CAMERA;
+                    if (showCameraTile) {
+                        return VIEWTYPE_CAMERA;
+                    } else if (showGalleryTile) {
+                        return VIEWTYPE_GALLERY;
+                    } else {
+                        return imageList == null ? VIEWTYPE_DUMMY : VIEWTYPE_IMAGE;
+                    }
                 case 1:
-                    return VIEWTYPE_GALLERY;
+                    return (showCameraTile && showGalleryTile) ? VIEWTYPE_GALLERY : (imageList == null ? VIEWTYPE_DUMMY : VIEWTYPE_IMAGE);
                 default:
                     return imageList == null ? VIEWTYPE_DUMMY : VIEWTYPE_IMAGE;
             }
@@ -214,7 +236,7 @@ public class ImageTileAdapter extends RecyclerView.Adapter<ImageTileAdapter.Base
 
         public void bind (int position) {
             if (imageList == null) return;
-            File imageFile = imageList.get(position - (isMultiSelect ? 0 : 2));
+            File imageFile = imageList.get(position - nonListItemCount);
             itemView.setTag(Uri.fromFile(imageFile));
             Glide.with(itemView).load(imageFile).into(ivImage);
             darken.setVisibility(selectedFiles.contains(imageFile)? View.VISIBLE : View.INVISIBLE);
