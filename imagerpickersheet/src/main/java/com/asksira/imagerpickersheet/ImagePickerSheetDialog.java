@@ -90,6 +90,8 @@ public class ImagePickerSheetDialog extends BottomSheetDialogFragment implements
     //Configurations
     private int maximumDisplayingImages = 50;
     private int peekHeight = Utils.dp2px(360);
+    private int minimumMultiSelectCount = 1;
+    private int maximumMultiSelectCount = Integer.MAX_VALUE;
     private String providerAuthority;
 
     @Override
@@ -278,6 +280,8 @@ public class ImagePickerSheetDialog extends BottomSheetDialogFragment implements
             providerAuthority = getArguments().getString("providerAuthority");
             isMultiSelection = getArguments().getBoolean("isMultiSelect");
             maximumDisplayingImages = getArguments().getInt("maximumDisplayingImages");
+            minimumMultiSelectCount = getArguments().getInt("minimumMultiSelectCount");
+            maximumMultiSelectCount = getArguments().getInt("maximumMultiSelectCount");
         } catch (Exception e) {
             if (BuildConfig.DEBUG) e.printStackTrace();
         }
@@ -322,6 +326,14 @@ public class ImagePickerSheetDialog extends BottomSheetDialogFragment implements
                     }
                 }
             });
+            if (isMultiSelection) {
+                adapter.setOnSelectedCountChangeListener(new ImageTileAdapter.OnSelectedCountChangeListener() {
+                    @Override
+                    public void onSelectedCountChange(int currentCount) {
+                        updateSelectCount(currentCount);
+                    }
+                });
+            }
         }
         recyclerView.setAdapter(adapter);
     }
@@ -332,6 +344,7 @@ public class ImagePickerSheetDialog extends BottomSheetDialogFragment implements
         ViewCompat.setTranslationZ(bottomBarView, ViewCompat.getZ((View) rootView.getParent()));
         parentView.addView(bottomBarView, -1);
         tvMultiSelectMessage = bottomBarView.findViewById(R.id.tv_multiselect_message);
+        tvMultiSelectMessage.setText(getString(R.string.imagepicker_multiselect_not_enough_singular));
         tvDone = bottomBarView.findViewById(R.id.tv_multiselect_done);
         tvDone.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -342,6 +355,8 @@ public class ImagePickerSheetDialog extends BottomSheetDialogFragment implements
                 }
             }
         });
+        tvDone.setAlpha(0.4f);
+        tvDone.setEnabled(false);
     }
 
     private void launchCamera() {
@@ -386,6 +401,25 @@ public class ImagePickerSheetDialog extends BottomSheetDialogFragment implements
         getContext().sendBroadcast(mediaScanIntent);
     }
 
+    private void updateSelectCount (int newCount) {
+        if (getContext() == null) return;
+        if (tvMultiSelectMessage != null) {
+            if (newCount < minimumMultiSelectCount) {
+                tvMultiSelectMessage.setText(minimumMultiSelectCount - newCount == 1 ?
+                        getString(R.string.imagepicker_multiselect_not_enough_singular) :
+                        getString(R.string.imagepicker_multiselect_not_enough_plural, minimumMultiSelectCount - newCount));
+                tvDone.setAlpha(0.4f);
+                tvDone.setEnabled(false);
+            } else {
+                tvMultiSelectMessage.setText(newCount == 1 ?
+                        getString(R.string.imagepicker_multiselect_enough_singular) :
+                        getString(R.string.imagepicker_multiselect_enough_plural, newCount));
+                tvDone.setAlpha(1f);
+                tvDone.setEnabled(true);
+            }
+        }
+    }
+
     /**
      * Builder of the ImagePickerSheetDialog.
      * Caller should always create the dialog using this builder.
@@ -394,7 +428,9 @@ public class ImagePickerSheetDialog extends BottomSheetDialogFragment implements
 
         private String providerAuthority;
         private boolean isMultiSelect;
-        private int maximumDisplayingImages;
+        private int maximumDisplayingImages = 50;
+        private int minimumMultiSelectCount = 1;
+        private int maximumMultiSelectCount = Integer.MAX_VALUE;
 
         public Builder(String providerAuthority) {
             this.providerAuthority = providerAuthority;
@@ -410,11 +446,24 @@ public class ImagePickerSheetDialog extends BottomSheetDialogFragment implements
             return this;
         }
 
+        public Builder setMinimumMultiSelectCount(int minimumMultiSelectCount) {
+            this.minimumMultiSelectCount = minimumMultiSelectCount;
+            return this;
+        }
+
+        public Builder setMaximumMultiSelectCount(int maximumMultiSelectCount) {
+            this.maximumMultiSelectCount = maximumMultiSelectCount;
+            return this;
+        }
+
         public ImagePickerSheetDialog build() {
             Bundle args = new Bundle();
             args.putString("providerAuthority", providerAuthority);
             args.putBoolean("isMultiSelect", isMultiSelect);
             args.putInt("maximumDisplayingImages", maximumDisplayingImages);
+            args.putInt("minimumMultiSelectCount", minimumMultiSelectCount);
+            args.putInt("maximumMultiSelectCount", maximumMultiSelectCount);
+
 
             ImagePickerSheetDialog fragment = new ImagePickerSheetDialog();
             fragment.setArguments(args);

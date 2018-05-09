@@ -33,6 +33,11 @@ public class ImageTileAdapter extends RecyclerView.Adapter<ImageTileAdapter.Base
     private View.OnClickListener galleryTileOnClickListener;
     private View.OnClickListener imageTileOnClickListener;
 
+    public interface OnSelectedCountChangeListener {
+        void onSelectedCountChange (int currentCount);
+    }
+    private OnSelectedCountChangeListener onSelectedCountChangeListener;
+
     public ImageTileAdapter(Context context, boolean isMultiSelect) {
         super();
         this.context = context;
@@ -103,6 +108,10 @@ public class ImageTileAdapter extends RecyclerView.Adapter<ImageTileAdapter.Base
         this.imageTileOnClickListener = imageTileOnClickListener;
     }
 
+    public void setOnSelectedCountChangeListener(OnSelectedCountChangeListener onSelectedCountChangeListener) {
+        this.onSelectedCountChangeListener = onSelectedCountChangeListener;
+    }
+
     public abstract static class BaseViewHolder extends RecyclerView.ViewHolder {
 
         public BaseViewHolder(View itemView) {
@@ -162,6 +171,9 @@ public class ImageTileAdapter extends RecyclerView.Adapter<ImageTileAdapter.Base
                         } else {
                             selectedFiles.add(thisFile);
                             notifyItemChanged(getAdapterPosition());
+                        }
+                        if (onSelectedCountChangeListener != null) {
+                            onSelectedCountChangeListener.onSelectedCountChange(selectedFiles.size());
                         }
                     }
                 });

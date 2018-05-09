@@ -6,6 +6,12 @@
     tools:layout_height="48dp"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_alignParentBottom="true"
+        android:background="@android:color/white"/>
+
     <TextView
         android:id="@+id/tv_multiselect_done"
         android:layout_width="wrap_content"
@@ -19,7 +25,6 @@
         android:paddingLeft="24dp"
         android:textSize="18sp"
         android:textColor="@android:color/holo_green_dark"
-        android:background="@android:color/white"
         android:foreground="?selectableItemBackground"/>
 
     <TextView
@@ -27,7 +32,6 @@
         android:layout_width="match_parent"
         android:layout_height="48dp"
         tools:text="You have to select 5 more images"
-        android:background="@android:color/white"
         android:gravity="start|center_vertical"
         android:layout_alignParentBottom="true"
         android:layout_toStartOf="@id/tv_multiselect_done"

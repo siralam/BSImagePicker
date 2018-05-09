@@ -32,6 +32,7 @@ public class MainActivity extends AppCompatActivity implements ImagePickerSheetD
                 ImagePickerSheetDialog pickerDialog = new ImagePickerSheetDialog.Builder("com.asksira.imagepickersheetdemo.fileprovider")
                         .setMaximumDisplayingImages(200)
                         .isMultiSelect()
+                        .setMinimumMultiSelectCount(1)
                         .build();
                 pickerDialog.show(getSupportFragmentManager(), "picker");
             }
