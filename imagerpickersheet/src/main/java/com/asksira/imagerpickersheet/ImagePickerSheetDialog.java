@@ -24,11 +24,13 @@ import android.support.v4.content.Loader;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SimpleItemAnimator;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 
 import java.io.File;
 import java.io.IOException;
@@ -64,6 +66,7 @@ public class ImagePickerSheetDialog extends BottomSheetDialogFragment implements
     //Views
     private RecyclerView recyclerView;
     private View bottomBarView;
+    private TextView tvDone, tvMultiSelectMessage;
 
     private BottomSheetBehavior bottomSheetBehavior;
 
@@ -74,8 +77,11 @@ public class ImagePickerSheetDialog extends BottomSheetDialogFragment implements
     public interface OnSingleImageSelectedListener {
         void onSingleImageSelected(Uri uri);
     }
-
     private OnSingleImageSelectedListener onSingleImageSelectedListener;
+    public interface OnMultiImageSelectedListener {
+        void onMultiImageSelected (List<Uri> uriList);
+    }
+    private OnMultiImageSelectedListener onMultiImageSelectedListener;
 
     //States
     private boolean isMultiSelection = false;
@@ -91,6 +97,9 @@ public class ImagePickerSheetDialog extends BottomSheetDialogFragment implements
         super.onAttach(context);
         if (context instanceof OnSingleImageSelectedListener) {
             onSingleImageSelectedListener = (OnSingleImageSelectedListener) context;
+        }
+        if (context instanceof OnMultiImageSelectedListener) {
+            onMultiImageSelectedListener = (OnMultiImageSelectedListener) context;
         }
     }
 
@@ -267,6 +276,8 @@ public class ImagePickerSheetDialog extends BottomSheetDialogFragment implements
     private void loadConfigFromBuilder() {
         try {
             providerAuthority = getArguments().getString("providerAuthority");
+            isMultiSelection = getArguments().getBoolean("isMultiSelect");
+            maximumDisplayingImages = getArguments().getInt("maximumDisplayingImages");
         } catch (Exception e) {
             if (BuildConfig.DEBUG) e.printStackTrace();
         }
@@ -275,40 +286,43 @@ public class ImagePickerSheetDialog extends BottomSheetDialogFragment implements
     private void setupRecyclerView() {
         GridLayoutManager gll = new GridLayoutManager(getContext(), 3);
         recyclerView.setLayoutManager(gll);
+        /* We are disabling item change animation because the default animation is fade out fade in, which will
+         * appear a little bit strange due to the fact that we are darkening the cell at the same time. */
+        ((SimpleItemAnimator)recyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
         recyclerView.addItemDecoration(new GridItemSpacingDecoration(3, Utils.dp2px(2), false));
-        adapter = new ImageTileAdapter(getContext());
-        adapter.setCameraTileOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (Utils.isCameraGranted(getContext()) && Utils.isWriteStorageGranted(getContext())) {
-                    launchCamera();
-                } else {
-                    if (Utils.isCameraGranted(getContext())) {
-                        Utils.checkPermission(ImagePickerSheetDialog.this, Manifest.permission.WRITE_EXTERNAL_STORAGE, PERMISSION_WRITE_STORAGE);
+        if (adapter == null) {
+            adapter = new ImageTileAdapter(getContext(), isMultiSelection);
+            adapter.setCameraTileOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (Utils.isCameraGranted(getContext()) && Utils.isWriteStorageGranted(getContext())) {
+                        launchCamera();
                     } else {
-                        Utils.checkPermission(ImagePickerSheetDialog.this, Manifest.permission.CAMERA, PERMISSION_CAMERA);
+                        if (Utils.isCameraGranted(getContext())) {
+                            Utils.checkPermission(ImagePickerSheetDialog.this, Manifest.permission.WRITE_EXTERNAL_STORAGE, PERMISSION_WRITE_STORAGE);
+                        } else {
+                            Utils.checkPermission(ImagePickerSheetDialog.this, Manifest.permission.CAMERA, PERMISSION_CAMERA);
+                        }
                     }
                 }
-            }
-        });
-        adapter.setGalleryTileOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                startActivityForResult(intent, REQUEST_SELECT_FROM_GALLERY);
-            }
-        });
-        adapter.setImageTileOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (v.getTag(R.id.i_have_to_do_this_to_prevent_glide_crash) != null
-                        && v.getTag(R.id.i_have_to_do_this_to_prevent_glide_crash) instanceof Uri
-                        && onSingleImageSelectedListener != null) {
-                    onSingleImageSelectedListener.onSingleImageSelected((Uri) v.getTag(R.id.i_have_to_do_this_to_prevent_glide_crash));
-                    dismiss();
+            });
+            adapter.setGalleryTileOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                    startActivityForResult(intent, REQUEST_SELECT_FROM_GALLERY);
                 }
-            }
-        });
+            });
+            adapter.setImageTileOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (v.getTag() != null && v.getTag() instanceof Uri && onSingleImageSelectedListener != null) {
+                        onSingleImageSelectedListener.onSingleImageSelected((Uri) v.getTag());
+                        dismiss();
+                    }
+                }
+            });
+        }
         recyclerView.setAdapter(adapter);
     }
 
@@ -317,6 +331,17 @@ public class ImagePickerSheetDialog extends BottomSheetDialogFragment implements
         bottomBarView = LayoutInflater.from(getContext()).inflate(R.layout.item_selection_bar, parentView, false);
         ViewCompat.setTranslationZ(bottomBarView, ViewCompat.getZ((View) rootView.getParent()));
         parentView.addView(bottomBarView, -1);
+        tvMultiSelectMessage = bottomBarView.findViewById(R.id.tv_multiselect_message);
+        tvDone = bottomBarView.findViewById(R.id.tv_multiselect_done);
+        tvDone.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (onMultiImageSelectedListener != null) {
+                    onMultiImageSelectedListener.onMultiImageSelected(adapter.getSelectedUris());
+                    dismiss();
+                }
+            }
+        });
     }
 
     private void launchCamera() {
@@ -368,14 +393,28 @@ public class ImagePickerSheetDialog extends BottomSheetDialogFragment implements
     public static class Builder {
 
         private String providerAuthority;
+        private boolean isMultiSelect;
+        private int maximumDisplayingImages;
 
         public Builder(String providerAuthority) {
             this.providerAuthority = providerAuthority;
         }
 
+        public Builder isMultiSelect () {
+            isMultiSelect = true;
+            return this;
+        }
+
+        public Builder setMaximumDisplayingImages (int maximumDisplayingImages) {
+            this.maximumDisplayingImages = maximumDisplayingImages;
+            return this;
+        }
+
         public ImagePickerSheetDialog build() {
             Bundle args = new Bundle();
             args.putString("providerAuthority", providerAuthority);
+            args.putBoolean("isMultiSelect", isMultiSelect);
+            args.putInt("maximumDisplayingImages", maximumDisplayingImages);
 
             ImagePickerSheetDialog fragment = new ImagePickerSheetDialog();
             fragment.setArguments(args);

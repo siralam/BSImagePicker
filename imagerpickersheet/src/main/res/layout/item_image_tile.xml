@@ -1,12 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.asksira.imagerpickersheet.widget.FitWidthImageView
-    android:id="@+id/item_imageTile"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+<com.asksira.imagerpickersheet.widget.FitWidthRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    app:view_aspectRatio="1"
-    android:scaleType="centerCrop"
-    android:background="@android:color/darker_gray">
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:view_aspectRatio="1">
 
-</com.asksira.imagerpickersheet.widget.FitWidthImageView>
+    <ImageView
+        android:id="@+id/item_imageTile"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/darker_gray"
+        android:scaleType="centerCrop"/>
+
+    <View
+        android:id="@+id/imageTile_selected_darken"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/black50"/>
+
+    <ImageView
+        android:id="@+id/imageTile_selected"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/selected"
+        android:layout_centerInParent="true"/>
+
+</com.asksira.imagerpickersheet.widget.FitWidthRelativeLayout>
