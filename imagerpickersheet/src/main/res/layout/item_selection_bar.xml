@@ -24,7 +24,7 @@
         android:paddingRight="24dp"
         android:paddingLeft="24dp"
         android:textSize="18sp"
-        android:textColor="@android:color/holo_green_dark"
+        android:textColor="@color/multiselect_done"
         android:foreground="?selectableItemBackground"/>
 
     <TextView
@@ -38,7 +38,8 @@
         android:layout_toLeftOf="@id/tv_multiselect_done"
         android:paddingLeft="16dp"
         android:paddingStart="16dp"
-        android:textSize="14sp">
+        android:textSize="14sp"
+        android:textColor="@color/primary_text">
 
     </TextView>
 

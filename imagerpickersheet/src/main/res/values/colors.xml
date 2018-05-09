@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="black50">#80000000</color>
+    <color name="primary_text">#212121</color>
+    <color name="multiselect_done">#388e3c</color>
+    <color name="error_text">#b71c1c</color>
 </resources>

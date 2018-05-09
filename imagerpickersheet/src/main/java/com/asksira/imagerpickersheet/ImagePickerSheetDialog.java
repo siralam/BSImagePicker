@@ -18,6 +18,7 @@ import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.FileProvider;
 import android.support.v4.content.Loader;
@@ -296,6 +297,7 @@ public class ImagePickerSheetDialog extends BottomSheetDialogFragment implements
         recyclerView.addItemDecoration(new GridItemSpacingDecoration(3, Utils.dp2px(2), false));
         if (adapter == null) {
             adapter = new ImageTileAdapter(getContext(), isMultiSelection);
+            adapter.setMaximumSelectionCount(maximumMultiSelectCount);
             adapter.setCameraTileOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -331,6 +333,12 @@ public class ImagePickerSheetDialog extends BottomSheetDialogFragment implements
                     @Override
                     public void onSelectedCountChange(int currentCount) {
                         updateSelectCount(currentCount);
+                    }
+                });
+                adapter.setOnOverSelectListener(new ImageTileAdapter.OnOverSelectListener() {
+                    @Override
+                    public void onOverSelect() {
+                        showOverSelectMessage();
                     }
                 });
             }
@@ -404,6 +412,7 @@ public class ImagePickerSheetDialog extends BottomSheetDialogFragment implements
     private void updateSelectCount (int newCount) {
         if (getContext() == null) return;
         if (tvMultiSelectMessage != null) {
+            tvMultiSelectMessage.setTextColor(ContextCompat.getColor(getContext(), R.color.primary_text));
             if (newCount < minimumMultiSelectCount) {
                 tvMultiSelectMessage.setText(minimumMultiSelectCount - newCount == 1 ?
                         getString(R.string.imagepicker_multiselect_not_enough_singular) :
@@ -417,6 +426,13 @@ public class ImagePickerSheetDialog extends BottomSheetDialogFragment implements
                 tvDone.setAlpha(1f);
                 tvDone.setEnabled(true);
             }
+        }
+    }
+
+    private void showOverSelectMessage () {
+        if (tvMultiSelectMessage != null && getContext() != null) {
+            tvMultiSelectMessage.setTextColor(ContextCompat.getColor(getContext(), R.color.error_text));
+            tvMultiSelectMessage.setText(getString(R.string.imagepicker_multiselect_overselect, maximumMultiSelectCount));
         }
     }
 

@@ -28,6 +28,7 @@ public class ImageTileAdapter extends RecyclerView.Adapter<ImageTileAdapter.Base
     protected List<File> imageList;
     protected boolean isMultiSelect;
     protected List<File> selectedFiles;
+    protected int maximumSelectionCount = Integer.MAX_VALUE;
 
     private View.OnClickListener cameraTileOnClickListener;
     private View.OnClickListener galleryTileOnClickListener;
@@ -37,6 +38,11 @@ public class ImageTileAdapter extends RecyclerView.Adapter<ImageTileAdapter.Base
         void onSelectedCountChange (int currentCount);
     }
     private OnSelectedCountChangeListener onSelectedCountChangeListener;
+
+    public interface OnOverSelectListener {
+        void onOverSelect ();
+    }
+    private OnOverSelectListener onOverSelectListener;
 
     public ImageTileAdapter(Context context, boolean isMultiSelect) {
         super();
@@ -112,6 +118,14 @@ public class ImageTileAdapter extends RecyclerView.Adapter<ImageTileAdapter.Base
         this.onSelectedCountChangeListener = onSelectedCountChangeListener;
     }
 
+    public void setMaximumSelectionCount(int maximumSelectionCount) {
+        this.maximumSelectionCount = maximumSelectionCount;
+    }
+
+    public void setOnOverSelectListener(OnOverSelectListener onOverSelectListener) {
+        this.onOverSelectListener = onOverSelectListener;
+    }
+
     public abstract static class BaseViewHolder extends RecyclerView.ViewHolder {
 
         public BaseViewHolder(View itemView) {
@@ -169,8 +183,13 @@ public class ImageTileAdapter extends RecyclerView.Adapter<ImageTileAdapter.Base
                             selectedFiles.remove(thisFile);
                             notifyItemChanged(getAdapterPosition());
                         } else {
-                            selectedFiles.add(thisFile);
-                            notifyItemChanged(getAdapterPosition());
+                            if (selectedFiles.size() == maximumSelectionCount) {
+                                if (onOverSelectListener != null) onOverSelectListener.onOverSelect();
+                                return;
+                            } else {
+                                selectedFiles.add(thisFile);
+                                notifyItemChanged(getAdapterPosition());
+                            }
                         }
                         if (onSelectedCountChangeListener != null) {
                             onSelectedCountChangeListener.onSelectedCountChange(selectedFiles.size());
