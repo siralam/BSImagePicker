@@ -96,6 +96,12 @@ public class ImageTileAdapter extends RecyclerView.Adapter<ImageTileAdapter.Base
         }
     }
 
+    public void setSelectedFiles (List<File> selectedFiles) {
+        this.selectedFiles = selectedFiles;
+        notifyDataSetChanged();
+        if (onSelectedCountChangeListener != null) onSelectedCountChangeListener.onSelectedCountChange(selectedFiles.size());
+    }
+
     public List<Uri> getSelectedUris () {
         List<Uri> result = new ArrayList<>();
         for (File each : selectedFiles) {

@@ -26,7 +26,16 @@ public class MainActivity extends AppCompatActivity implements ImagePickerSheetD
         ivImage4 = findViewById(R.id.iv_image4);
         ivImage5 = findViewById(R.id.iv_image5);
         ivImage6 = findViewById(R.id.iv_image6);
-        findViewById(R.id.entrance).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.tv_single_selection).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ImagePickerSheetDialog pickerDialog = new ImagePickerSheetDialog.Builder("com.asksira.imagepickersheetdemo.fileprovider")
+                        .setMaximumDisplayingImages(Integer.MAX_VALUE)
+                        .build();
+                pickerDialog.show(getSupportFragmentManager(), "picker");
+            }
+        });
+        findViewById(R.id.tv_multi_selection).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 ImagePickerSheetDialog pickerDialog = new ImagePickerSheetDialog.Builder("com.asksira.imagepickersheetdemo.fileprovider")

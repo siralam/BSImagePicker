@@ -115,6 +115,9 @@ public class ImagePickerSheetDialog extends BottomSheetDialogFragment implements
         } else {
             Utils.checkPermission(ImagePickerSheetDialog.this, Manifest.permission.READ_EXTERNAL_STORAGE, PERMISSION_READ_STORAGE);
         }
+        if (savedInstanceState != null) {
+            currentPhotoUri = savedInstanceState.getParcelable("currentPhotoUri");
+        }
     }
 
     @Nullable
@@ -123,7 +126,6 @@ public class ImagePickerSheetDialog extends BottomSheetDialogFragment implements
         View view = inflater.inflate(R.layout.layout_picker_sheet, container, false);
         bindViews(view);
         setupRecyclerView();
-
         return view;
     }
 
@@ -169,6 +171,17 @@ public class ImagePickerSheetDialog extends BottomSheetDialogFragment implements
         if (isMultiSelection) {
             recyclerView.setPadding(0, 0, 0, Utils.dp2px(48));
             setupBottomBar(getView());
+        }
+        if (savedInstanceState != null && adapter != null) {
+            List<Uri> savedUriList = savedInstanceState.getParcelableArrayList("selectedImages");
+            if (savedUriList != null) {
+                List<File> fileList = new ArrayList<>();
+                for (Uri each : savedUriList) {
+                    File file = new File(URI.create(each.toString()));
+                    fileList.add(file);
+                }
+                adapter.setSelectedFiles(fileList);
+            }
         }
     }
 
@@ -238,6 +251,13 @@ public class ImagePickerSheetDialog extends BottomSheetDialogFragment implements
             default:
                 super.onActivityResult(requestCode, resultCode, data);
         }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList("selectedImages", (ArrayList<Uri>) adapter.getSelectedUris());
+        outState.putParcelable("currentPhotoUri", currentPhotoUri);
     }
 
     @Override
