@@ -1,6 +1,7 @@
 package com.asksira.imagerpickersheet;
 
 import android.content.Context;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,6 +28,7 @@ public class ImageTileAdapter extends RecyclerView.Adapter<ImageTileAdapter.Base
 
     private View.OnClickListener cameraTileOnClickListener;
     private View.OnClickListener galleryTileOnClickListener;
+    private View.OnClickListener imageTileOnClickListener;
 
     public ImageTileAdapter(Context context) {
         super();
@@ -80,6 +82,10 @@ public class ImageTileAdapter extends RecyclerView.Adapter<ImageTileAdapter.Base
         this.galleryTileOnClickListener = galleryTileOnClickListener;
     }
 
+    public void setImageTileOnClickListener(View.OnClickListener imageTileOnClickListener) {
+        this.imageTileOnClickListener = imageTileOnClickListener;
+    }
+
     public abstract static class BaseViewHolder extends RecyclerView.ViewHolder {
 
         public BaseViewHolder(View itemView) {
@@ -123,11 +129,13 @@ public class ImageTileAdapter extends RecyclerView.Adapter<ImageTileAdapter.Base
         public ImageTileViewHolder(View itemView) {
             super(itemView);
             ivImage = itemView.findViewById(R.id.item_imageTile);
+            itemView.setOnClickListener(imageTileOnClickListener);
         }
 
         public void bind (int position) {
             if (imageList == null) return;
             File imageFile = imageList.get(position - 2);
+            itemView.setTag(R.id.i_have_to_do_this_to_prevent_glide_crash, Uri.fromFile(imageFile));
             Glide.with(itemView).load(imageFile).into(ivImage);
         }
     }

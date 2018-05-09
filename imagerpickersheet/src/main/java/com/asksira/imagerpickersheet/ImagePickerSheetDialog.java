@@ -43,7 +43,7 @@ import static android.app.Activity.RESULT_OK;
 /**
  * This is the core class of this library, which extends BottomSheetDialogFragment
  * from the design support library, in order to provide the basic architecture of a bottom sheet.
- *
+ * <p>
  * It is also responsible for:
  * - Handling permission
  * - Communicate with caller activity / fragment
@@ -72,8 +72,9 @@ public class ImagePickerSheetDialog extends BottomSheetDialogFragment implements
 
     //Callbacks
     public interface OnSingleImageSelectedListener {
-        void onSingleImageSelected (Uri uri);
+        void onSingleImageSelected(Uri uri);
     }
+
     private OnSingleImageSelectedListener onSingleImageSelectedListener;
 
     //States
@@ -209,7 +210,8 @@ public class ImagePickerSheetDialog extends BottomSheetDialogFragment implements
                         File file = new File(URI.create(currentPhotoUri.toString()));
                         file.delete();
                     } catch (Exception e) {
-                        if (BuildConfig.DEBUG) Log.d("ImagePicker", "Failed to delete temp file: " + currentPhotoUri.toString());
+                        if (BuildConfig.DEBUG)
+                            Log.d("ImagePicker", "Failed to delete temp file: " + currentPhotoUri.toString());
                     }
                 }
                 break;
@@ -258,11 +260,11 @@ public class ImagePickerSheetDialog extends BottomSheetDialogFragment implements
         adapter.setImageList(null);
     }
 
-    private void bindViews (View rootView) {
+    private void bindViews(View rootView) {
         recyclerView = rootView.findViewById(R.id.picker_recyclerview);
     }
 
-    private void loadConfigFromBuilder () {
+    private void loadConfigFromBuilder() {
         try {
             providerAuthority = getArguments().getString("providerAuthority");
         } catch (Exception e) {
@@ -270,7 +272,7 @@ public class ImagePickerSheetDialog extends BottomSheetDialogFragment implements
         }
     }
 
-    private void setupRecyclerView () {
+    private void setupRecyclerView() {
         GridLayoutManager gll = new GridLayoutManager(getContext(), 3);
         recyclerView.setLayoutManager(gll);
         recyclerView.addItemDecoration(new GridItemSpacingDecoration(3, Utils.dp2px(2), false));
@@ -296,17 +298,28 @@ public class ImagePickerSheetDialog extends BottomSheetDialogFragment implements
                 startActivityForResult(intent, REQUEST_SELECT_FROM_GALLERY);
             }
         });
+        adapter.setImageTileOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (v.getTag(R.id.i_have_to_do_this_to_prevent_glide_crash) != null
+                        && v.getTag(R.id.i_have_to_do_this_to_prevent_glide_crash) instanceof Uri
+                        && onSingleImageSelectedListener != null) {
+                    onSingleImageSelectedListener.onSingleImageSelected((Uri) v.getTag(R.id.i_have_to_do_this_to_prevent_glide_crash));
+                    dismiss();
+                }
+            }
+        });
         recyclerView.setAdapter(adapter);
     }
 
-    private void setupBottomBar (View rootView) {
+    private void setupBottomBar(View rootView) {
         CoordinatorLayout parentView = (CoordinatorLayout) (rootView.getParent().getParent());
         bottomBarView = LayoutInflater.from(getContext()).inflate(R.layout.item_selection_bar, parentView, false);
-        ViewCompat.setTranslationZ(bottomBarView, ViewCompat.getZ((View)rootView.getParent()));
+        ViewCompat.setTranslationZ(bottomBarView, ViewCompat.getZ((View) rootView.getParent()));
         parentView.addView(bottomBarView, -1);
     }
 
-    private void launchCamera () {
+    private void launchCamera() {
         if (getContext() == null) return;
         Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePhotoIntent.resolveActivity(getContext().getPackageManager()) != null) {
@@ -326,7 +339,7 @@ public class ImagePickerSheetDialog extends BottomSheetDialogFragment implements
         }
     }
 
-    private File createImageFile () throws IOException {
+    private File createImageFile() throws IOException {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime());
         String imageFileName = "JPEG_" + timeStamp + "_";
         File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
@@ -356,11 +369,11 @@ public class ImagePickerSheetDialog extends BottomSheetDialogFragment implements
 
         private String providerAuthority;
 
-        public Builder (String providerAuthority) {
+        public Builder(String providerAuthority) {
             this.providerAuthority = providerAuthority;
         }
 
-        public ImagePickerSheetDialog build () {
+        public ImagePickerSheetDialog build() {
             Bundle args = new Bundle();
             args.putString("providerAuthority", providerAuthority);
 
