@@ -45,6 +45,9 @@ public class MainActivity extends AppCompatActivity implements ImagePickerSheetD
                         .isMultiSelect()
                         .setMinimumMultiSelectCount(3)
                         .setMaximumMultiSelectCount(6)
+                        .setMultiSelectBarBgColor(R.color.black50)
+                        .setMultiSelectTextColor(android.R.color.white)
+                        .setMultiSelectDoneTextColor(R.color.colorAccent)
                         .build();
                 pickerDialog.show(getSupportFragmentManager(), "picker");
             }

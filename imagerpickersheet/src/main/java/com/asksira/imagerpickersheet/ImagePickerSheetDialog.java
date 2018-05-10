@@ -395,11 +395,14 @@ public class ImagePickerSheetDialog extends BottomSheetDialogFragment implements
         bottomBarView = LayoutInflater.from(getContext()).inflate(R.layout.item_picker_multiselection_bar, parentView, false);
         ViewCompat.setTranslationZ(bottomBarView, ViewCompat.getZ((View) rootView.getParent()));
         parentView.addView(bottomBarView, -1);
+        bottomBarView.findViewById(R.id.multiselect_bar_bg).setBackgroundColor(ContextCompat.getColor(getContext(), multiSelectBarBgColor));
         tvMultiSelectMessage = bottomBarView.findViewById(R.id.tv_multiselect_message);
+        tvMultiSelectMessage.setTextColor(ContextCompat.getColor(getContext(), multiSelectTextColor));
         tvMultiSelectMessage.setText(minimumMultiSelectCount == 1 ?
                 getString(R.string.imagepicker_multiselect_not_enough_singular) :
                 getString(R.string.imagepicker_multiselect_not_enough_plural, minimumMultiSelectCount));
         tvDone = bottomBarView.findViewById(R.id.tv_multiselect_done);
+        tvDone.setTextColor(ContextCompat.getColor(getContext(), multiSelectDoneTextColor));
         tvDone.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
