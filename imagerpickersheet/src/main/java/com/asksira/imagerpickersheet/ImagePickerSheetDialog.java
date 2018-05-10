@@ -180,7 +180,6 @@ public class ImagePickerSheetDialog extends BottomSheetDialogFragment implements
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         if (isMultiSelection) {
-            recyclerView.setPadding(0, 0, 0, Utils.dp2px(48));
             setupBottomBar(getView());
         }
         if (savedInstanceState != null && adapter != null) {
@@ -382,7 +381,7 @@ public class ImagePickerSheetDialog extends BottomSheetDialogFragment implements
                 adapter.setOnOverSelectListener(new ImageTileAdapter.OnOverSelectListener() {
                     @Override
                     public void onOverSelect() {
-                        showOverSelectMessage();
+                        if (showOverSelectMessage) showOverSelectMessage();
                     }
                 });
             }
@@ -461,7 +460,7 @@ public class ImagePickerSheetDialog extends BottomSheetDialogFragment implements
     private void updateSelectCount (int newCount) {
         if (getContext() == null) return;
         if (tvMultiSelectMessage != null) {
-            tvMultiSelectMessage.setTextColor(ContextCompat.getColor(getContext(), R.color.primary_text));
+            tvMultiSelectMessage.setTextColor(ContextCompat.getColor(getContext(), multiSelectTextColor));
             if (newCount < minimumMultiSelectCount) {
                 tvMultiSelectMessage.setText(minimumMultiSelectCount - newCount == 1 ?
                         getString(R.string.imagepicker_multiselect_not_enough_singular) :
@@ -480,7 +479,7 @@ public class ImagePickerSheetDialog extends BottomSheetDialogFragment implements
 
     private void showOverSelectMessage () {
         if (tvMultiSelectMessage != null && getContext() != null) {
-            tvMultiSelectMessage.setTextColor(ContextCompat.getColor(getContext(), R.color.error_text));
+            tvMultiSelectMessage.setTextColor(ContextCompat.getColor(getContext(), overSelectTextColor));
             tvMultiSelectMessage.setText(getString(R.string.imagepicker_multiselect_overselect, maximumMultiSelectCount));
         }
     }

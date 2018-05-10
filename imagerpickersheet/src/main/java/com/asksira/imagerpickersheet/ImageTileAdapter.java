@@ -24,6 +24,7 @@ public class ImageTileAdapter extends RecyclerView.Adapter<ImageTileAdapter.Base
     private static final int VIEWTYPE_GALLERY = 102;
     private static final int VIEWTYPE_IMAGE = 103;
     private static final int VIEWTYPE_DUMMY = 104;
+    private static final int VIEWTYPE_BOTTOM_SPACE = 105;
 
     protected Context context;
     protected List<File> imageList;
@@ -31,8 +32,8 @@ public class ImageTileAdapter extends RecyclerView.Adapter<ImageTileAdapter.Base
     protected List<File> selectedFiles;
     protected int maximumSelectionCount = Integer.MAX_VALUE;
     protected int nonListItemCount;
-    private boolean showCameraTile = true;
-    private boolean showGalleryTile = true;
+    private boolean showCameraTile;
+    private boolean showGalleryTile;
 
     private View.OnClickListener cameraTileOnClickListener;
     private View.OnClickListener galleryTileOnClickListener;
@@ -77,6 +78,11 @@ public class ImageTileAdapter extends RecyclerView.Adapter<ImageTileAdapter.Base
                 return new GalleryTileViewHolder(LayoutInflater.from(context).inflate(R.layout.item_picker_gallery_tile, parent, false));
             case VIEWTYPE_DUMMY:
                 return new DummyViewHolder(LayoutInflater.from(context).inflate(R.layout.item_picker_dummy_tile, parent, false));
+            case VIEWTYPE_BOTTOM_SPACE:
+                View view = new View(context);
+                ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, Utils.dp2px(48));
+                view.setLayoutParams(lp);
+                return new DummyViewHolder(view);
             default:
                 return new ImageTileViewHolder(LayoutInflater.from(context).inflate(R.layout.item_picker_image_tile, parent, false));
         }
@@ -92,7 +98,7 @@ public class ImageTileAdapter extends RecyclerView.Adapter<ImageTileAdapter.Base
         if (!isMultiSelect) {
             return imageList == null ? 16 : nonListItemCount + imageList.size();
         } else {
-            return imageList == null ? 16 : imageList.size();
+            return imageList == null ? 16 : imageList.size() + 1;
         }
     }
 
@@ -114,6 +120,7 @@ public class ImageTileAdapter extends RecyclerView.Adapter<ImageTileAdapter.Base
                     return imageList == null ? VIEWTYPE_DUMMY : VIEWTYPE_IMAGE;
             }
         } else {
+            if (position == getItemCount() - 1) return VIEWTYPE_BOTTOM_SPACE;
             return imageList == null ? VIEWTYPE_DUMMY : VIEWTYPE_IMAGE;
         }
     }

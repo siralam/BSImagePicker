@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity implements ImagePickerSheetD
             @Override
             public void onClick(View v) {
                 ImagePickerSheetDialog pickerDialog = new ImagePickerSheetDialog.Builder("com.asksira.imagepickersheetdemo.fileprovider")
-                        .setMaximumDisplayingImages(Integer.MAX_VALUE)
+                        .setMaximumDisplayingImages(24)
                         .hideCameraTile()
                         .hideGalleryTile()
                         .build();
@@ -41,13 +41,14 @@ public class MainActivity extends AppCompatActivity implements ImagePickerSheetD
             @Override
             public void onClick(View v) {
                 ImagePickerSheetDialog pickerDialog = new ImagePickerSheetDialog.Builder("com.asksira.imagepickersheetdemo.fileprovider")
-                        .setMaximumDisplayingImages(Integer.MAX_VALUE)
+                        .setMaximumDisplayingImages(24)
                         .isMultiSelect()
                         .setMinimumMultiSelectCount(3)
                         .setMaximumMultiSelectCount(6)
                         .setMultiSelectBarBgColor(R.color.black50)
                         .setMultiSelectTextColor(android.R.color.white)
                         .setMultiSelectDoneTextColor(R.color.colorAccent)
+                        .disableOverSelectionMessage()
                         .build();
                 pickerDialog.show(getSupportFragmentManager(), "picker");
             }
