@@ -6,13 +6,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageView;
 
-import com.asksira.imagerpickersheet.ImagePickerSheetDialog;
+import com.asksira.bsimagepicker.BSImagePicker;
 import com.bumptech.glide.Glide;
 
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements ImagePickerSheetDialog.OnSingleImageSelectedListener,
-        ImagePickerSheetDialog.OnMultiImageSelectedListener{
+public class MainActivity extends AppCompatActivity implements BSImagePicker.OnSingleImageSelectedListener,
+        BSImagePicker.OnMultiImageSelectedListener{
 
     private ImageView ivImage1, ivImage2, ivImage3, ivImage4, ivImage5, ivImage6;
 
@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity implements ImagePickerSheetD
         findViewById(R.id.tv_single_selection).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ImagePickerSheetDialog pickerDialog = new ImagePickerSheetDialog.Builder("com.asksira.imagepickersheetdemo.fileprovider")
+                BSImagePicker pickerDialog = new BSImagePicker.Builder("com.asksira.imagepickersheetdemo.fileprovider")
                         .build();
                 pickerDialog.show(getSupportFragmentManager(), "picker");
             }
@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity implements ImagePickerSheetD
         findViewById(R.id.tv_multi_selection).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ImagePickerSheetDialog pickerDialog = new ImagePickerSheetDialog.Builder("com.asksira.imagepickersheetdemo.fileprovider")
+                BSImagePicker pickerDialog = new BSImagePicker.Builder("com.asksira.imagepickersheetdemo.fileprovider")
                         .setMaximumDisplayingImages(Integer.MAX_VALUE)
                         .isMultiSelect()
                         .setMinimumMultiSelectCount(3)

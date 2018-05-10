@@ -26,5 +26,5 @@ dependencies {
         exclude group: "com.android.support"
     }
     annotationProcessor 'com.github.bumptech.glide:compiler:4.6.1'
-    implementation project(':imagerpickersheet')
+    implementation project(':bsimagepicker')
 }

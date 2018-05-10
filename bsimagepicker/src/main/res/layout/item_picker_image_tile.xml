@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.asksira.bsimagepicker.widget.FitWidthRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:view_aspectRatio="1">
+
+    <ImageView
+        android:id="@+id/item_imageTile"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/darker_gray"
+        android:scaleType="centerCrop"/>
+
+    <View
+        android:id="@+id/imageTile_selected_darken"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/black50"/>
+
+    <ImageView
+        android:id="@+id/imageTile_selected"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/picker_tile_selected"
+        android:layout_centerInParent="true"/>
+
+</com.asksira.bsimagepicker.widget.FitWidthRelativeLayout>
