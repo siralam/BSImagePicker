@@ -96,10 +96,6 @@ public class ImagePickerSheetDialog extends BottomSheetDialogFragment implements
     private int minimumMultiSelectCount = 1;
     private int maximumMultiSelectCount = Integer.MAX_VALUE;
     private String providerAuthority;
-    private int cameraTileBgColor = android.R.color.black;
-    private int galleryTileBgColor = android.R.color.darker_gray;
-    private int cameraTileIcon = R.drawable.picker_icon_camera;
-    private int galleryTileIcon = R.drawable.picker_icon_gallery;
     private boolean showCameraTile = true;
     private boolean showGalleryTile = true;
     private int spanCount = 3;
@@ -317,6 +313,9 @@ public class ImagePickerSheetDialog extends BottomSheetDialogFragment implements
             maximumMultiSelectCount = getArguments().getInt("maximumMultiSelectCount");
             showCameraTile = getArguments().getBoolean("showCameraTile");
             showGalleryTile = getArguments().getBoolean("showGalleryTile");
+            spanCount = getArguments().getInt("spanCount");
+            peekHeight = getArguments().getInt("peekHeight");
+            gridSpacing = getArguments().getInt("gridSpacing");
         } catch (Exception e) {
             if (BuildConfig.DEBUG) e.printStackTrace();
         }
@@ -327,12 +326,12 @@ public class ImagePickerSheetDialog extends BottomSheetDialogFragment implements
     }
 
     private void setupRecyclerView() {
-        GridLayoutManager gll = new GridLayoutManager(getContext(), 3);
+        GridLayoutManager gll = new GridLayoutManager(getContext(), spanCount);
         recyclerView.setLayoutManager(gll);
         /* We are disabling item change animation because the default animation is fade out fade in, which will
          * appear a little bit strange due to the fact that we are darkening the cell at the same time. */
         ((SimpleItemAnimator)recyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
-        recyclerView.addItemDecoration(new GridItemSpacingDecoration(3, Utils.dp2px(2), false));
+        recyclerView.addItemDecoration(new GridItemSpacingDecoration(spanCount, gridSpacing, false));
         if (adapter == null) {
             adapter = new ImageTileAdapter(getContext(), isMultiSelection, showCameraTile, showGalleryTile);
             adapter.setMaximumSelectionCount(maximumMultiSelectCount);
