@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -430,6 +431,11 @@ public class ImagePickerSheetDialog extends BottomSheetDialogFragment implements
                         providerAuthority,
                         photoFile);
                 takePhotoIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                List<ResolveInfo> resolvedIntentActivities = getContext().getPackageManager().queryIntentActivities(takePhotoIntent, PackageManager.MATCH_DEFAULT_ONLY);
+                for (ResolveInfo resolvedIntentInfo : resolvedIntentActivities) {
+                    String packageName = resolvedIntentInfo.activityInfo.packageName;
+                    getContext().grantUriPermission(packageName, photoURI, Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                }
                 startActivityForResult(takePhotoIntent, REQUEST_TAKE_PHOTO);
             }
         }

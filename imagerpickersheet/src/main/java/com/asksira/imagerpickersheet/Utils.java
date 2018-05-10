@@ -1,12 +1,10 @@
 package com.asksira.imagerpickersheet;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.os.Build;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.util.TypedValue;
@@ -15,14 +13,6 @@ public class Utils {
 
     public static int dp2px (int dp) {
         return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, Resources.getSystem().getDisplayMetrics());
-    }
-
-    public static void checkPermission (Activity activity, String permissionString, int permissionCode) {
-        if ((android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.M)) return;
-        int existingPermissionStatus = ContextCompat.checkSelfPermission(activity,
-                permissionString);
-        if (existingPermissionStatus == PackageManager.PERMISSION_GRANTED) return;
-        ActivityCompat.requestPermissions(activity, new String[]{permissionString}, permissionCode);
     }
 
     public static void checkPermission (Fragment fragment, String permissionString, int permissionCode) {
