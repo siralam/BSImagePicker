@@ -33,9 +33,6 @@ public class MainActivity extends AppCompatActivity implements ImagePickerSheetD
                         .setMaximumDisplayingImages(Integer.MAX_VALUE)
                         .hideCameraTile()
                         .hideGalleryTile()
-                        .setSpanCount(2)
-                        .setGridSpacing(Utils.dp2px(5))
-                        .setPeekHeight(Utils.dp2px(800))
                         .build();
                 pickerDialog.show(getSupportFragmentManager(), "picker");
             }
@@ -48,9 +45,6 @@ public class MainActivity extends AppCompatActivity implements ImagePickerSheetD
                         .isMultiSelect()
                         .setMinimumMultiSelectCount(3)
                         .setMaximumMultiSelectCount(6)
-                        .setSpanCount(2)
-                        .setGridSpacing(Utils.dp2px(5))
-                        .setPeekHeight(Utils.dp2px(800))
                         .build();
                 pickerDialog.show(getSupportFragmentManager(), "picker");
             }

@@ -293,7 +293,7 @@ public class ImagePickerSheetDialog extends BottomSheetDialogFragment implements
                 uriList.add(new File(imagePath));
                 index++;
             }
-            cursor.moveToFirst();
+            cursor.moveToPosition(-1);
             adapter.setImageList(uriList);
             //We are not closing the cursor here because Android Doc says Loader will manage them.
         }
@@ -316,6 +316,11 @@ public class ImagePickerSheetDialog extends BottomSheetDialogFragment implements
             spanCount = getArguments().getInt("spanCount");
             peekHeight = getArguments().getInt("peekHeight");
             gridSpacing = getArguments().getInt("gridSpacing");
+            multiSelectBarBgColor = getArguments().getInt("multiSelectBarBgColor");
+            multiSelectTextColor = getArguments().getInt("multiSelectTextColor");
+            multiSelectDoneTextColor = getArguments().getInt("multiSelectDoneTextColor");
+            showOverSelectMessage = getArguments().getBoolean("showOverSelectMessage");
+            overSelectTextColor = getArguments().getInt("overSelectTextColor");
         } catch (Exception e) {
             if (BuildConfig.DEBUG) e.printStackTrace();
         }
