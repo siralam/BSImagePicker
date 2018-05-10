@@ -107,6 +107,9 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
     private boolean showOverSelectMessage = true;
     private int overSelectTextColor = R.color.error_text;
 
+    /**
+     * Here we check if the caller Activity has registered callback and reference it.
+     */
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -138,9 +141,28 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
         View view = inflater.inflate(R.layout.layout_imagepicker_sheet, container, false);
         bindViews(view);
         setupRecyclerView();
+        /*
+         Here we check if the parent fragment has registered callback and reference it.
+         */
+        if (getParentFragment() != null && getParentFragment() instanceof OnSingleImageSelectedListener) {
+            onSingleImageSelectedListener = (OnSingleImageSelectedListener) getParentFragment();
+        }
+        if (getParentFragment() != null && getParentFragment() instanceof OnMultiImageSelectedListener) {
+            onMultiImageSelectedListener = (OnMultiImageSelectedListener) getParentFragment();
+        }
+        /*
+         If no correct callback is registered, throw an exception.
+         */
+        if ((isMultiSelection && onMultiImageSelectedListener == null) ||
+                (!isMultiSelection) && onSingleImageSelectedListener == null) {
+            throw new IllegalArgumentException("Your caller activity or parent fragment must implements the correct ImageSelectedListener");
+        }
         return view;
     }
 
+    /**
+     * Here we make the bottom bar fade out when the Dialog is being slided down.
+     */
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         BottomSheetDialog dialog = (BottomSheetDialog) super.onCreateDialog(savedInstanceState);
@@ -177,6 +199,9 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
         return dialog;
     }
 
+    /**
+     * Here we create and setup the bottom bar if in multi-selection mode.
+     */
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -293,7 +318,7 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
                 uriList.add(new File(imagePath));
                 index++;
             }
-            cursor.moveToPosition(-1);
+            cursor.moveToPosition(-1); //Restore cursor back to the beginning
             adapter.setImageList(uriList);
             //We are not closing the cursor here because Android Doc says Loader will manage them.
         }
@@ -527,16 +552,25 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
         }
 
         public Builder setMinimumMultiSelectCount(int minimumMultiSelectCount) {
+            if (minimumMultiSelectCount <= 0) {
+                throw new IllegalArgumentException("Minimum Multi Select Count must be >= 1");
+            }
             this.minimumMultiSelectCount = minimumMultiSelectCount;
             return this;
         }
 
         public Builder setMaximumMultiSelectCount(int maximumMultiSelectCount) {
+            if (maximumMultiSelectCount < 0) {
+                throw new IllegalArgumentException("Maximum Multi Select Count must be > 0");
+            }
             this.maximumMultiSelectCount = maximumMultiSelectCount;
             return this;
         }
 
         public Builder setGridSpacing(@Px int gridSpacing) {
+            if (gridSpacing < 0) {
+                throw new IllegalArgumentException("Grid spacing must be >= 0");
+            }
             this.gridSpacing = gridSpacing;
             return this;
         }
@@ -562,6 +596,9 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
         }
 
         public Builder setPeekHeight(@Px int peekHeight) {
+            if (peekHeight < 0) {
+                throw new IllegalArgumentException("Peek Height must be >= 0");
+            }
             this.peekHeight = peekHeight;
             return this;
         }
@@ -582,6 +619,9 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
         }
 
         public Builder setSpanCount(int spanCount) {
+            if (spanCount < 0) {
+                throw new IllegalArgumentException("Span Count must be > 0");
+            }
             this.spanCount = spanCount;
             return this;
         }

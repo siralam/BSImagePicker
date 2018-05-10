@@ -35,3 +35,31 @@ dependencies {
     }
     annotationProcessor 'com.github.bumptech.glide:compiler:4.6.1'
 }
+
+ext {
+    bintrayRepo = 'maven'
+    bintrayName = 'BSImagePicker'
+
+    publishedGroupId = 'com.asksira.android'
+    libraryName = 'BSImagePicker'
+    artifact = 'bsimagepicker'
+
+    libraryDescription = 'An image picker that extends BottomSheetDialogFragment. Camera and gallery all in one dialog. Single or Multi Selection.'
+
+    siteUrl = 'https://github.com/siralam/BSImagePicker'
+    gitUrl = 'https://github.com/siralam/BSImagePicker.git'
+
+    libraryVersion = '1.0.1'
+
+    developerId = 'siralam'
+    developerName = 'Sira Lam'
+    developerEmail = 'sira.swlam@gmail.com'
+
+    licenseName = 'The Apache Software License, Version 2.0'
+    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    allLicenses = ["Apache-2.0"]
+}
+
+// Place it at the end of the file
+apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle'
+apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/bintrayv1.gradle'
