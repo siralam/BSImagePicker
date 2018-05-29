@@ -58,6 +58,8 @@ And then add the below to your app's build.gradle:
     implementation 'com.asksira.android:bsimagepicker:1.0.1'
 ```
 
+You also need to make sure you have included `'com.android.support:support-v4:{supportLibraryVersion}` in your dependencies.
+
 ### Step 1: Create your own FileProvider
 
 Just follow the guide from [Official Android Document](https://developer.android.com/reference/android/support/v4/content/FileProvider#ProviderDefinition).
