@@ -123,9 +123,16 @@ public class MainActivity extends AppCompatActivity implements BSImagePicker.OnS
 
 ### Step 4: Show the picker, which is essentially just a DialogFragment
 
+If you called from an Activity:
 ```java
        //pickerDialog is the one your created in Step 2
        pickerDialog.show(getSupportFragmentManager(), "picker");
+```
+
+If you called from a Fragment:
+```java
+       //pickerDialog is the one your created in Step 2
+       pickerDialog.show(getChildFragmentManager(), "picker");
 ```
 
 ## Customization of layouts
