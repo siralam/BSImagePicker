@@ -70,7 +70,7 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
     //Views
     private RecyclerView recyclerView;
     private View bottomBarView;
-    private TextView tvDone, tvMultiSelectMessage;
+    private TextView tvDone, tvMultiSelectMessage, emptyViewText;
 
     private BottomSheetBehavior bottomSheetBehavior;
 
@@ -81,10 +81,13 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
     public interface OnSingleImageSelectedListener {
         void onSingleImageSelected(Uri uri);
     }
+
     private OnSingleImageSelectedListener onSingleImageSelectedListener;
+
     public interface OnMultiImageSelectedListener {
-        void onMultiImageSelected (List<Uri> uriList);
+        void onMultiImageSelected(List<Uri> uriList);
     }
+
     private OnMultiImageSelectedListener onMultiImageSelectedListener;
 
     //States
@@ -321,6 +324,15 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
             cursor.moveToPosition(-1); //Restore cursor back to the beginning
             adapter.setImageList(uriList);
             //We are not closing the cursor here because Android Doc says Loader will manage them.
+
+            if (uriList.size() < 1 && !showCameraTile && !showGalleryTile) {
+                emptyViewText.setVisibility(View.VISIBLE);
+                if (bottomBarView != null) {
+                    bottomBarView.setVisibility(View.GONE);
+                }
+            } else {
+                emptyViewText.setVisibility(View.GONE);
+            }
         }
     }
 
@@ -353,6 +365,7 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
 
     private void bindViews(View rootView) {
         recyclerView = rootView.findViewById(R.id.picker_recyclerview);
+        emptyViewText = rootView.findViewById(R.id.empty_view_text);
     }
 
     private void setupRecyclerView() {
@@ -360,7 +373,7 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
         recyclerView.setLayoutManager(gll);
         /* We are disabling item change animation because the default animation is fade out fade in, which will
          * appear a little bit strange due to the fact that we are darkening the cell at the same time. */
-        ((SimpleItemAnimator)recyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
+        ((SimpleItemAnimator) recyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
         recyclerView.addItemDecoration(new GridItemSpacingDecoration(spanCount, gridSpacing, false));
         if (adapter == null) {
             adapter = new ImageTileAdapter(getContext(), isMultiSelection, showCameraTile, showGalleryTile);
@@ -419,7 +432,7 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
         CoordinatorLayout parentView = (CoordinatorLayout) (rootView.getParent().getParent());
         bottomBarView = LayoutInflater.from(getContext()).inflate(R.layout.item_picker_multiselection_bar, parentView, false);
         ViewCompat.setTranslationZ(bottomBarView, ViewCompat.getZ((View) rootView.getParent()));
-        parentView.addView(bottomBarView, -1);
+        parentView.addView(bottomBarView, -2);
         bottomBarView.findViewById(R.id.multiselect_bar_bg).setBackgroundColor(ContextCompat.getColor(getContext(), multiSelectBarBgColor));
         tvMultiSelectMessage = bottomBarView.findViewById(R.id.tv_multiselect_message);
         tvMultiSelectMessage.setTextColor(ContextCompat.getColor(getContext(), multiSelectTextColor));
@@ -488,7 +501,7 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
         getContext().sendBroadcast(mediaScanIntent);
     }
 
-    private void updateSelectCount (int newCount) {
+    private void updateSelectCount(int newCount) {
         if (getContext() == null) return;
         if (tvMultiSelectMessage != null) {
             tvMultiSelectMessage.setTextColor(ContextCompat.getColor(getContext(), multiSelectTextColor));
@@ -508,7 +521,7 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
         }
     }
 
-    private void showOverSelectMessage () {
+    private void showOverSelectMessage() {
         if (tvMultiSelectMessage != null && getContext() != null) {
             tvMultiSelectMessage.setTextColor(ContextCompat.getColor(getContext(), overSelectTextColor));
             tvMultiSelectMessage.setText(getString(R.string.imagepicker_multiselect_overselect, maximumMultiSelectCount));
@@ -541,12 +554,12 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
             this.providerAuthority = providerAuthority;
         }
 
-        public Builder isMultiSelect () {
+        public Builder isMultiSelect() {
             isMultiSelect = true;
             return this;
         }
 
-        public Builder setMaximumDisplayingImages (int maximumDisplayingImages) {
+        public Builder setMaximumDisplayingImages(int maximumDisplayingImages) {
             this.maximumDisplayingImages = maximumDisplayingImages;
             return this;
         }
@@ -613,7 +626,7 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
             return this;
         }
 
-        public Builder disableOverSelectionMessage () {
+        public Builder disableOverSelectionMessage() {
             this.showOverSelectMessage = false;
             return this;
         }
