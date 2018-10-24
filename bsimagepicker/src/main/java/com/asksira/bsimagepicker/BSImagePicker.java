@@ -90,6 +90,7 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
 
     //States
     private boolean isMultiSelection = false;
+    private boolean dismissOnSelect = true;
     private Uri currentPhotoUri;
 
     //Configurations
@@ -265,7 +266,7 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
                     notifyGallery();
                     if (onSingleImageSelectedListener != null) {
                         onSingleImageSelectedListener.onSingleImageSelected(currentPhotoUri, tag);
-                        dismiss();
+                        if (dismissOnSelect) dismiss();
                     }
                 } else {
                     try {
@@ -281,7 +282,7 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
                 if (resultCode == RESULT_OK) {
                     if (onSingleImageSelectedListener != null) {
                         onSingleImageSelectedListener.onSingleImageSelected(data.getData(), tag);
-                        dismiss();
+                        if (dismissOnSelect) dismiss();
                     }
                 }
                 break;
@@ -335,6 +336,7 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
             providerAuthority = getArguments().getString("providerAuthority");
             tag = getArguments().getString("tag");
             isMultiSelection = getArguments().getBoolean("isMultiSelect");
+            dismissOnSelect = getArguments().getBoolean("dismissOnSelect");
             maximumDisplayingImages = getArguments().getInt("maximumDisplayingImages");
             minimumMultiSelectCount = getArguments().getInt("minimumMultiSelectCount");
             maximumMultiSelectCount = getArguments().getInt("maximumMultiSelectCount");
@@ -395,7 +397,7 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
                 public void onClick(View v) {
                     if (v.getTag() != null && v.getTag() instanceof Uri && onSingleImageSelectedListener != null) {
                         onSingleImageSelectedListener.onSingleImageSelected((Uri) v.getTag(), tag);
-                        dismiss();
+                        if (dismissOnSelect) dismiss();
                     }
                 }
             });
@@ -526,6 +528,7 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
         private String providerAuthority;
         private String tag;
         private boolean isMultiSelect;
+        private boolean dismissOnSelect;
         private int maximumDisplayingImages = Integer.MAX_VALUE;
         private int minimumMultiSelectCount = 1;
         private int maximumMultiSelectCount = Integer.MAX_VALUE;
@@ -546,6 +549,11 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
 
         public Builder isMultiSelect () {
             isMultiSelect = true;
+            return this;
+        }
+
+        public Builder dontDismissOnSelect() {
+            this.dismissOnSelect = false;
             return this;
         }
 
@@ -583,7 +591,7 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
             return this;
         }
 
-        public Builder setTag( String tag) {
+        public Builder setTag(String tag) {
             this.tag = tag;
             return this;
         }
@@ -639,6 +647,7 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
             args.putString("providerAuthority", providerAuthority);
             args.putString("tag", tag);
             args.putBoolean("isMultiSelect", isMultiSelect);
+            args.putBoolean("dismissOnSelect", dismissOnSelect);
             args.putInt("maximumDisplayingImages", maximumDisplayingImages);
             args.putInt("minimumMultiSelectCount", minimumMultiSelectCount);
             args.putInt("maximumMultiSelectCount", maximumMultiSelectCount);
