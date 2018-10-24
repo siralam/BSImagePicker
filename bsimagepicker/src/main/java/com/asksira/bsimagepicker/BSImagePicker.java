@@ -76,14 +76,15 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
 
     //Components
     private ImageTileAdapter adapter;
+    private String tag = "";
 
     //Callbacks
     public interface OnSingleImageSelectedListener {
-        void onSingleImageSelected(Uri uri);
+        void onSingleImageSelected(Uri uri, String tag);
     }
     private OnSingleImageSelectedListener onSingleImageSelectedListener;
     public interface OnMultiImageSelectedListener {
-        void onMultiImageSelected (List<Uri> uriList);
+        void onMultiImageSelected (List<Uri> uriList, String tag);
     }
     private OnMultiImageSelectedListener onMultiImageSelectedListener;
 
@@ -264,9 +265,8 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
                 if (resultCode == RESULT_OK) {
                     notifyGallery();
                     if (onSingleImageSelectedListener != null) {
-                        onSingleImageSelectedListener.onSingleImageSelected(currentPhotoUri);
-                        if(dismissOnSelect)dismiss();
-
+                        onSingleImageSelectedListener.onSingleImageSelected(currentPhotoUri, tag);
+                        if (dismissOnSelect) dismiss();
                     }
                 } else {
                     try {
@@ -281,8 +281,8 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
             case REQUEST_SELECT_FROM_GALLERY:
                 if (resultCode == RESULT_OK) {
                     if (onSingleImageSelectedListener != null) {
-                        onSingleImageSelectedListener.onSingleImageSelected(data.getData());
-                        if(dismissOnSelect)dismiss();
+                        onSingleImageSelectedListener.onSingleImageSelected(data.getData(), tag);
+                        if (dismissOnSelect) dismiss();
                     }
                 }
                 break;
@@ -334,6 +334,7 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
     private void loadConfigFromBuilder() {
         try {
             providerAuthority = getArguments().getString("providerAuthority");
+            tag = getArguments().getString("tag");
             isMultiSelection = getArguments().getBoolean("isMultiSelect");
             dismissOnSelect = getArguments().getBoolean("dismissOnSelect");
             maximumDisplayingImages = getArguments().getInt("maximumDisplayingImages");
@@ -395,8 +396,8 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
                 @Override
                 public void onClick(View v) {
                     if (v.getTag() != null && v.getTag() instanceof Uri && onSingleImageSelectedListener != null) {
-                        onSingleImageSelectedListener.onSingleImageSelected((Uri) v.getTag());
-                        if(dismissOnSelect)dismiss();
+                        onSingleImageSelectedListener.onSingleImageSelected((Uri) v.getTag(), tag);
+                        if (dismissOnSelect) dismiss();
                     }
                 }
             });
@@ -435,7 +436,7 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
             @Override
             public void onClick(View v) {
                 if (onMultiImageSelectedListener != null) {
-                    onMultiImageSelectedListener.onMultiImageSelected(adapter.getSelectedUris());
+                    onMultiImageSelectedListener.onMultiImageSelected(adapter.getSelectedUris(), tag);
                     dismiss();
                 }
             }
@@ -525,6 +526,7 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
     public static class Builder {
 
         private String providerAuthority;
+        private String tag;
         private boolean isMultiSelect;
         private boolean dismissOnSelect;
         private int maximumDisplayingImages = Integer.MAX_VALUE;
@@ -589,6 +591,11 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
             return this;
         }
 
+        public Builder setTag(String tag) {
+            this.tag = tag;
+            return this;
+        }
+
         public Builder setMultiSelectDoneTextColor(@ColorRes int multiSelectDoneTextColor) {
             this.multiSelectDoneTextColor = multiSelectDoneTextColor;
             return this;
@@ -638,6 +645,7 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
         public BSImagePicker build() {
             Bundle args = new Bundle();
             args.putString("providerAuthority", providerAuthority);
+            args.putString("tag", tag);
             args.putBoolean("isMultiSelect", isMultiSelect);
             args.putBoolean("dismissOnSelect", dismissOnSelect);
             args.putInt("maximumDisplayingImages", maximumDisplayingImages);
