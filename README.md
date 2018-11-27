@@ -55,7 +55,7 @@ allprojects {
 And then add the below to your app's build.gradle:  
 
 ```groovy
-    implementation 'com.asksira.android:bsimagepicker:1.0.1'
+    implementation 'com.asksira.android:bsimagepicker:1.0.2'
 ```
 
 You also need to make sure you have included `'com.android.support:support-v4:{supportLibraryVersion}` in your dependencies.
@@ -79,7 +79,9 @@ Single Selection:
                .setGridSpacing(Utils.dp2px(2)) //Default: 2dp. Remember to pass in a value in pixel.
                .setPeekHeight(Utils.dp2px(360)) //Default: 360dp. This is the initial height of the dialog.
                .hideCameraTile() //Default: show. Set this if you don't want user to take photo.
-               .hideGalleryTile() //Default: show. Set this if you don't want to further let user select from a gallery app. In such case, I suggest you to set maximum     displaying    images to Integer.MAX_VALUE.
+               .hideGalleryTile() //Default: show. Set this if you don't want to further let user select from a gallery app. In such case, I suggest you to set maximum displaying images to Integer.MAX_VALUE.
+               .setTag("A request ID") //Default: null. Set this if you need to identify which picker is calling back your fragment / activity.
+               .dismissOnSelect(true) //Default: true. Set this if you do not want the picker to dismiss right after selection. But then you will have to dismiss by yourself.
                .build();
 ```
 
@@ -110,16 +112,18 @@ public class MainActivity extends AppCompatActivity implements BSImagePicker.OnS
     //...
 
     @Override
-    public void onSingleImageSelected(Uri uri) {
+    public void onSingleImageSelected(Uri uri, String tag) {
         //Do something with your Uri
     }
 
     @Override
-    public void onMultiImageSelected(List<Uri> uriList) {
+    public void onMultiImageSelected(List<Uri> uriList, String tag) {
         //Do something with your Uri list
     }
 }
 ```
+
+You can set a `tag` in the picker's builder. This is useful when you need to show more than 1 picker in the same page, so that you have a way to distinguish which one is calling back to your Activity / Fragment.
 
 ### Step 4: Show the picker, which is essentially just a DialogFragment
 
@@ -155,6 +159,7 @@ Define below String resources with the same ID in your own app:
     <string name="imagepicker_multiselect_enough_singular">You have selected 1 image</string>
     <string name="imagepicker_multiselect_enough_plural">You have selected %d images</string>
     <string name="imagepicker_multiselect_overselect">You cannot select more than %d images</string>
+    <string name="imagepicker_no_image_text_view">There are no image in your device.</string>
 ```
 
 **IMPORTANT: Your string resources must match the number of replaceables (%d) with the original resources above.**
@@ -167,6 +172,11 @@ You ask why don't I use plurals? [See this post](https://stackoverflow.com/quest
 2. Since the customization of layouts are done by resource overriding, it is impossible to set different style for different pickers in the same app. I consider this as an edge case.
 
 ## Release notes
+
+v1.1.0
+- Picker now supports a tag (String) as an identifier, so that you can identify which picker calls back your fragment / activity. This is useful if you need to launch more than 1 picker in the same fragment / activity. (Solves #3)
+- Picker now displays a TextView if there is nothing to show, instead of just dimming the screen. (Solves #9)
+- You can now decide whether to dismiss the picker after a selection. (Solves #6)
 
 v1.0.1 
 First Release.
