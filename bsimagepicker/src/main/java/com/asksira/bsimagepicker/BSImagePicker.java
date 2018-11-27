@@ -528,7 +528,7 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
         private String providerAuthority;
         private String tag;
         private boolean isMultiSelect;
-        private boolean dismissOnSelect;
+        private boolean dismissOnSelect = true;
         private int maximumDisplayingImages = Integer.MAX_VALUE;
         private int minimumMultiSelectCount = 1;
         private int maximumMultiSelectCount = Integer.MAX_VALUE;

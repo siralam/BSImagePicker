@@ -51,7 +51,6 @@ public class MainActivity extends AppCompatActivity implements BSImagePicker.OnS
 
     @Override
     public void onSingleImageSelected(Uri uri, String tag) {
-        Toast.makeText(this, tag, Toast.LENGTH_SHORT).show();
         Glide.with(MainActivity.this).load(uri).into(ivImage2);
     }
 
