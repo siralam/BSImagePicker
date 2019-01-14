@@ -30,6 +30,9 @@ public class Utils {
     }
 
     public static boolean isWriteStorageGranted (Context context) {
+        if(android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
+            return true;
+        }
         int storagePermissionGranted = ContextCompat.checkSelfPermission(context,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE);
         return storagePermissionGranted == PackageManager.PERMISSION_GRANTED;
