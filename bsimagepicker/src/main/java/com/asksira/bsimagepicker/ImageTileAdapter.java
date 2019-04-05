@@ -2,7 +2,6 @@ package com.asksira.bsimagepicker;
 
 import android.content.Context;
 import android.net.Uri;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +12,9 @@ import com.bumptech.glide.Glide;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 
 /**
  * The RecyclerView's adapter of the selectable ivImage tiles.
@@ -69,8 +71,9 @@ public class ImageTileAdapter extends RecyclerView.Adapter<ImageTileAdapter.Base
         }
     }
 
+    @NonNull
     @Override
-    public ImageTileAdapter.BaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ImageTileAdapter.BaseViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         switch (viewType) {
             case VIEWTYPE_CAMERA:
                 return new CameraTileViewHolder(LayoutInflater.from(context).inflate(R.layout.item_picker_camera_tile, parent, false));

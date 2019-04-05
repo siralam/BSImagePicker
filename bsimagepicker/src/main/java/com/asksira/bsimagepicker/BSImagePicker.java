@@ -1,6 +1,7 @@
 package com.asksira.bsimagepicker;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -12,29 +13,16 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.annotation.ColorRes;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.Px;
-import android.support.design.widget.BottomSheetBehavior;
-import android.support.design.widget.BottomSheetDialog;
-import android.support.design.widget.BottomSheetDialogFragment;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.FileProvider;
-import android.support.v4.content.Loader;
-import android.support.v4.view.ViewCompat;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SimpleItemAnimator;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import java.io.File;
 import java.io.IOException;
@@ -43,6 +31,21 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+
+import androidx.annotation.ColorRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.Px;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
+import androidx.core.view.ViewCompat;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.CursorLoader;
+import androidx.loader.content.Loader;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.SimpleItemAnimator;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -82,10 +85,13 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
     public interface OnSingleImageSelectedListener {
         void onSingleImageSelected(Uri uri, String tag);
     }
+
     private OnSingleImageSelectedListener onSingleImageSelectedListener;
+
     public interface OnMultiImageSelectedListener {
-        void onMultiImageSelected (List<Uri> uriList, String tag);
+        void onMultiImageSelected(List<Uri> uriList, String tag);
     }
+
     private OnMultiImageSelectedListener onMultiImageSelectedListener;
 
     //States
@@ -113,7 +119,7 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
      * Here we check if the caller Activity has registered callback and reference it.
      */
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         if (context instanceof OnSingleImageSelectedListener) {
             onSingleImageSelectedListener = (OnSingleImageSelectedListener) context;
@@ -128,7 +134,7 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
         super.onCreate(savedInstanceState);
         loadConfigFromBuilder();
         if (Utils.isReadStorageGranted(getContext())) {
-            getLoaderManager().initLoader(LOADER_ID, null, BSImagePicker.this);
+            LoaderManager.getInstance(this).initLoader(LOADER_ID, null, BSImagePicker.this);
         } else {
             Utils.checkPermission(BSImagePicker.this, Manifest.permission.READ_EXTERNAL_STORAGE, PERMISSION_READ_STORAGE);
         }
@@ -165,6 +171,7 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
     /**
      * Here we make the bottom bar fade out when the Dialog is being slided down.
      */
+    @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         BottomSheetDialog dialog = (BottomSheetDialog) super.onCreateDialog(savedInstanceState);
@@ -173,17 +180,15 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
             public void onShow(DialogInterface dialog) {
                 //Get the BottomSheetBehavior
                 BottomSheetDialog d = (BottomSheetDialog) dialog;
-                FrameLayout bottomSheet = d.findViewById(android.support.design.R.id.design_bottom_sheet);
+                FrameLayout bottomSheet = d.findViewById(R.id.design_bottom_sheet);
                 if (bottomSheet != null) {
                     bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
                     bottomSheetBehavior.setPeekHeight(peekHeight);
                     bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
                         @Override
                         public void onStateChanged(@NonNull View bottomSheet, int newState) {
-                            switch (newState) {
-                                case BottomSheetBehavior.STATE_HIDDEN:
-                                    dismiss();
-                                    break;
+                            if (newState == BottomSheetBehavior.STATE_HIDDEN) {
+                                dismiss();
                             }
                         }
 
@@ -208,7 +213,7 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         if (isMultiSelection) {
-            setupBottomBar(getView());
+            setupBottomBar(requireView());
         }
         if (savedInstanceState != null && adapter != null) {
             List<Uri> savedUriList = savedInstanceState.getParcelableArrayList("selectedImages");
@@ -232,7 +237,7 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
         switch (requestCode) {
             case PERMISSION_READ_STORAGE:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    getLoaderManager().initLoader(LOADER_ID, null, this);
+                    LoaderManager.getInstance(this).initLoader(LOADER_ID, null, this);
                 } else {
                     dismiss();
                 }
@@ -292,12 +297,13 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putParcelableArrayList("selectedImages", (ArrayList<Uri>) adapter.getSelectedUris());
         outState.putParcelable("currentPhotoUri", currentPhotoUri);
     }
 
+    @NonNull
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         if (id == LOADER_ID && getContext() != null) {
@@ -311,7 +317,7 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+    public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor cursor) {
         if (cursor != null) {
             List<File> uriList = new ArrayList<>();
             int index = 0;
@@ -339,34 +345,39 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
     }
 
     @Override
-    public void onLoaderReset(Loader loader) {
+    public void onLoaderReset(@NonNull Loader loader) {
         adapter.setImageList(null);
     }
 
     private void loadConfigFromBuilder() {
         try {
-            providerAuthority = getArguments().getString("providerAuthority");
-            tag = getArguments().getString("tag");
-            isMultiSelection = getArguments().getBoolean("isMultiSelect");
-            dismissOnSelect = getArguments().getBoolean("dismissOnSelect");
-            maximumDisplayingImages = getArguments().getInt("maximumDisplayingImages");
-            minimumMultiSelectCount = getArguments().getInt("minimumMultiSelectCount");
-            maximumMultiSelectCount = getArguments().getInt("maximumMultiSelectCount");
+            Bundle args = getArguments();
+            if (args == null) {
+                return;
+            }
+
+            providerAuthority = args.getString("providerAuthority");
+            tag = args.getString("tag");
+            isMultiSelection = args.getBoolean("isMultiSelect");
+            dismissOnSelect = args.getBoolean("dismissOnSelect");
+            maximumDisplayingImages = args.getInt("maximumDisplayingImages");
+            minimumMultiSelectCount = args.getInt("minimumMultiSelectCount");
+            maximumMultiSelectCount = args.getInt("maximumMultiSelectCount");
             if (isMultiSelection) {
                 showCameraTile = false;
                 showGalleryTile = false;
             } else {
-                showCameraTile = getArguments().getBoolean("showCameraTile");
-                showGalleryTile = getArguments().getBoolean("showGalleryTile");
+                showCameraTile = args.getBoolean("showCameraTile");
+                showGalleryTile = args.getBoolean("showGalleryTile");
             }
-            spanCount = getArguments().getInt("spanCount");
-            peekHeight = getArguments().getInt("peekHeight");
-            gridSpacing = getArguments().getInt("gridSpacing");
-            multiSelectBarBgColor = getArguments().getInt("multiSelectBarBgColor");
-            multiSelectTextColor = getArguments().getInt("multiSelectTextColor");
-            multiSelectDoneTextColor = getArguments().getInt("multiSelectDoneTextColor");
-            showOverSelectMessage = getArguments().getBoolean("showOverSelectMessage");
-            overSelectTextColor = getArguments().getInt("overSelectTextColor");
+            spanCount = args.getInt("spanCount");
+            peekHeight = args.getInt("peekHeight");
+            gridSpacing = args.getInt("gridSpacing");
+            multiSelectBarBgColor = args.getInt("multiSelectBarBgColor");
+            multiSelectTextColor = args.getInt("multiSelectTextColor");
+            multiSelectDoneTextColor = args.getInt("multiSelectDoneTextColor");
+            showOverSelectMessage = args.getBoolean("showOverSelectMessage");
+            overSelectTextColor = args.getInt("overSelectTextColor");
         } catch (Exception e) {
             if (BuildConfig.DEBUG) e.printStackTrace();
         }
@@ -382,7 +393,10 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
         recyclerView.setLayoutManager(gll);
         /* We are disabling item change animation because the default animation is fade out fade in, which will
          * appear a little bit strange due to the fact that we are darkening the cell at the same time. */
-        ((SimpleItemAnimator)recyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
+        RecyclerView.ItemAnimator itemAnimator = recyclerView.getItemAnimator();
+        if (itemAnimator instanceof SimpleItemAnimator) {
+            ((SimpleItemAnimator) itemAnimator).setSupportsChangeAnimations(false);
+        }
         recyclerView.addItemDecoration(new GridItemSpacingDecoration(spanCount, gridSpacing, false));
         if (adapter == null) {
             adapter = new ImageTileAdapter(getContext(), isMultiSelection, showCameraTile, showGalleryTile);
@@ -442,14 +456,14 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
         bottomBarView = LayoutInflater.from(getContext()).inflate(R.layout.item_picker_multiselection_bar, parentView, false);
         ViewCompat.setTranslationZ(bottomBarView, ViewCompat.getZ((View) rootView.getParent()));
         parentView.addView(bottomBarView, -2);
-        bottomBarView.findViewById(R.id.multiselect_bar_bg).setBackgroundColor(ContextCompat.getColor(getContext(), multiSelectBarBgColor));
+        bottomBarView.findViewById(R.id.multiselect_bar_bg).setBackgroundColor(ContextCompat.getColor(requireContext(), multiSelectBarBgColor));
         tvMultiSelectMessage = bottomBarView.findViewById(R.id.tv_multiselect_message);
-        tvMultiSelectMessage.setTextColor(ContextCompat.getColor(getContext(), multiSelectTextColor));
+        tvMultiSelectMessage.setTextColor(ContextCompat.getColor(requireContext(), multiSelectTextColor));
         tvMultiSelectMessage.setText(minimumMultiSelectCount == 1 ?
                 getString(R.string.imagepicker_multiselect_not_enough_singular) :
                 getString(R.string.imagepicker_multiselect_not_enough_plural, minimumMultiSelectCount));
         tvDone = bottomBarView.findViewById(R.id.tv_multiselect_done);
-        tvDone.setTextColor(ContextCompat.getColor(getContext(), multiSelectDoneTextColor));
+        tvDone.setTextColor(ContextCompat.getColor(requireContext(), multiSelectDoneTextColor));
         tvDone.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -488,6 +502,7 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
         }
     }
 
+    @SuppressLint("SimpleDateFormat")
     private File createImageFile() throws IOException {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime());
         String imageFileName = "JPEG_" + timeStamp + "_";
@@ -510,7 +525,7 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
         getContext().sendBroadcast(mediaScanIntent);
     }
 
-    private void updateSelectCount (int newCount) {
+    private void updateSelectCount(int newCount) {
         if (getContext() == null) return;
         if (tvMultiSelectMessage != null) {
             tvMultiSelectMessage.setTextColor(ContextCompat.getColor(getContext(), multiSelectTextColor));
@@ -530,7 +545,7 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
         }
     }
 
-    private void showOverSelectMessage () {
+    private void showOverSelectMessage() {
         if (tvMultiSelectMessage != null && getContext() != null) {
             tvMultiSelectMessage.setTextColor(ContextCompat.getColor(getContext(), overSelectTextColor));
             tvMultiSelectMessage.setText(getString(R.string.imagepicker_multiselect_overselect, maximumMultiSelectCount));
@@ -541,7 +556,7 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
      * Returns the TextView that appears when there is no item,
      * So that user can customize its styles, etc.
      */
-    public TextView getEmptyTextView () {
+    public TextView getEmptyTextView() {
         return tvEmptyView;
     }
 
@@ -573,7 +588,7 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
             this.providerAuthority = providerAuthority;
         }
 
-        public Builder isMultiSelect () {
+        public Builder isMultiSelect() {
             isMultiSelect = true;
             return this;
         }
@@ -583,7 +598,7 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
             return this;
         }
 
-        public Builder setMaximumDisplayingImages (int maximumDisplayingImages) {
+        public Builder setMaximumDisplayingImages(int maximumDisplayingImages) {
             this.maximumDisplayingImages = maximumDisplayingImages;
             return this;
         }
@@ -655,7 +670,7 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
             return this;
         }
 
-        public Builder disableOverSelectionMessage () {
+        public Builder disableOverSelectionMessage() {
             this.showOverSelectMessage = false;
             return this;
         }

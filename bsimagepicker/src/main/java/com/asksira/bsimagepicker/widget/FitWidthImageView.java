@@ -6,12 +6,14 @@ import android.util.AttributeSet;
 
 import com.asksira.bsimagepicker.R;
 
+import androidx.appcompat.widget.AppCompatImageView;
+
 /**
  * An ImageView that measures itself according to specified aspect ratio.
  * This does not work if height is match_parent.
  */
 
-public class FitWidthImageView extends android.support.v7.widget.AppCompatImageView {
+public class FitWidthImageView extends AppCompatImageView {
 
     /**
      * Aspect ratio is calculated by width / height.
