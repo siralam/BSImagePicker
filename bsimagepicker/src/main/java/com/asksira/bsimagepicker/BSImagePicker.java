@@ -265,30 +265,22 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode != RESULT_OK) {
+            super.onActivityResult(requestCode, resultCode, data);
+            return;
+        }
         switch (requestCode) {
             case REQUEST_TAKE_PHOTO:
-                if (resultCode == RESULT_OK) {
-                    notifyGallery();
-                    if (onSingleImageSelectedListener != null) {
-                        onSingleImageSelectedListener.onSingleImageSelected(currentPhotoUri, tag);
-                        if (dismissOnSelect) dismiss();
-                    }
-                } else {
-                    try {
-                        File file = new File(URI.create(currentPhotoUri.toString()));
-                        file.delete();
-                    } catch (Exception e) {
-                        if (BuildConfig.DEBUG)
-                            Log.d("ImagePicker", "Failed to delete temp file: " + currentPhotoUri.toString());
-                    }
+                notifyGallery();
+                if (onSingleImageSelectedListener != null) {
+                    onSingleImageSelectedListener.onSingleImageSelected(currentPhotoUri, tag);
+                    if (dismissOnSelect) dismiss();
                 }
                 break;
             case REQUEST_SELECT_FROM_GALLERY:
-                if (resultCode == RESULT_OK) {
-                    if (onSingleImageSelectedListener != null) {
-                        onSingleImageSelectedListener.onSingleImageSelected(data.getData(), tag);
-                        if (dismissOnSelect) dismiss();
-                    }
+                if (onSingleImageSelectedListener != null) {
+                    onSingleImageSelectedListener.onSingleImageSelected(data.getData(), tag);
+                    if (dismissOnSelect) dismiss();
                 }
                 break;
             default:
@@ -512,6 +504,10 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
                 ".jpg",   /* suffix */
                 storageDir      /* directory */
         );
+        boolean success = image.delete(); //no need to create empty file; camera app will create it on success
+        if (!success && BuildConfig.DEBUG) {
+            Log.d("ImagePicker", "Failed to delete temp file: " + currentPhotoUri.toString());
+        }
 
         // Save a file: path for use with ACTION_VIEW intents
         currentPhotoUri = Uri.fromFile(image);
