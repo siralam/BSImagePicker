@@ -129,10 +129,7 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
         }
         if (context instanceof ImageLoaderDelegate) {
             imageLoaderDelegate = (ImageLoaderDelegate) context;
-        } else {
-            throw new RuntimeException(context.toString() + " must implement ImageLoaderDelegate");
         }
-
     }
 
     @Override
@@ -164,12 +161,18 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
         if (getParentFragment() != null && getParentFragment() instanceof OnMultiImageSelectedListener) {
             onMultiImageSelectedListener = (OnMultiImageSelectedListener) getParentFragment();
         }
+        if (getParentFragment() != null && getParentFragment() instanceof ImageLoaderDelegate) {
+            imageLoaderDelegate = (ImageLoaderDelegate) getParentFragment();
+        }
         /*
          If no correct callback is registered, throw an exception.
          */
         if ((isMultiSelection && onMultiImageSelectedListener == null) ||
                 (!isMultiSelection) && onSingleImageSelectedListener == null) {
             throw new IllegalArgumentException("Your caller activity or parent fragment must implements the correct ImageSelectedListener");
+        }
+        if (imageLoaderDelegate == null) {
+            throw new IllegalArgumentException("Your caller activity or parent fragment must implements ImageLoaderDelegate");
         }
         return view;
     }
