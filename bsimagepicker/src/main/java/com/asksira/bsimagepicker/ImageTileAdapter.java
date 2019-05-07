@@ -8,8 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.bumptech.glide.Glide;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,22 +38,31 @@ public class ImageTileAdapter extends RecyclerView.Adapter<ImageTileAdapter.Base
     private View.OnClickListener imageTileOnClickListener;
 
     public interface OnSelectedCountChangeListener {
-        void onSelectedCountChange (int currentCount);
+        void onSelectedCountChange(int currentCount);
     }
+
     private OnSelectedCountChangeListener onSelectedCountChangeListener;
 
     public interface OnOverSelectListener {
-        void onOverSelect ();
+        void onOverSelect();
     }
-    private OnOverSelectListener onOverSelectListener;
 
-    public ImageTileAdapter(Context context, boolean isMultiSelect, boolean showCameraTile, boolean showGalleryTile) {
+    private OnOverSelectListener onOverSelectListener;
+    private BSImagePicker.ImageLoaderDelegate imageLoaderDelegate;
+
+    public ImageTileAdapter(
+            Context context,
+            BSImagePicker.ImageLoaderDelegate imageLoaderDelegate,
+            boolean isMultiSelect,
+            boolean showCameraTile,
+            boolean showGalleryTile) {
         super();
         this.context = context;
         this.isMultiSelect = isMultiSelect;
         selectedFiles = new ArrayList<>();
         this.showCameraTile = showCameraTile;
         this.showGalleryTile = showGalleryTile;
+        this.imageLoaderDelegate = imageLoaderDelegate;
         if (isMultiSelect) {
             nonListItemCount = 0;
         } else {
@@ -125,13 +132,14 @@ public class ImageTileAdapter extends RecyclerView.Adapter<ImageTileAdapter.Base
         }
     }
 
-    public void setSelectedFiles (List<File> selectedFiles) {
+    public void setSelectedFiles(List<File> selectedFiles) {
         this.selectedFiles = selectedFiles;
         notifyDataSetChanged();
-        if (onSelectedCountChangeListener != null) onSelectedCountChangeListener.onSelectedCountChange(selectedFiles.size());
+        if (onSelectedCountChangeListener != null)
+            onSelectedCountChangeListener.onSelectedCountChange(selectedFiles.size());
     }
 
-    public List<Uri> getSelectedUris () {
+    public List<Uri> getSelectedUris() {
         List<Uri> result = new ArrayList<>();
         for (File each : selectedFiles) {
             result.add(Uri.fromFile(each));
@@ -139,7 +147,7 @@ public class ImageTileAdapter extends RecyclerView.Adapter<ImageTileAdapter.Base
         return result;
     }
 
-    public void setImageList (List<File> imageList) {
+    public void setImageList(List<File> imageList) {
         this.imageList = imageList;
         notifyDataSetChanged();
     }
@@ -226,7 +234,8 @@ public class ImageTileAdapter extends RecyclerView.Adapter<ImageTileAdapter.Base
                             notifyItemChanged(getAdapterPosition());
                         } else {
                             if (selectedFiles.size() == maximumSelectionCount) {
-                                if (onOverSelectListener != null) onOverSelectListener.onOverSelect();
+                                if (onOverSelectListener != null)
+                                    onOverSelectListener.onOverSelect();
                                 return;
                             } else {
                                 selectedFiles.add(thisFile);
@@ -241,13 +250,13 @@ public class ImageTileAdapter extends RecyclerView.Adapter<ImageTileAdapter.Base
             }
         }
 
-        public void bind (int position) {
+        public void bind(int position) {
             if (imageList == null) return;
             File imageFile = imageList.get(position - nonListItemCount);
             itemView.setTag(Uri.fromFile(imageFile));
-            Glide.with(itemView).load(imageFile).into(ivImage);
-            darken.setVisibility(selectedFiles.contains(imageFile)? View.VISIBLE : View.INVISIBLE);
-            ivTick.setVisibility(selectedFiles.contains(imageFile)? View.VISIBLE : View.INVISIBLE);
+            imageLoaderDelegate.loadImage(imageFile, ivImage);
+            darken.setVisibility(selectedFiles.contains(imageFile) ? View.VISIBLE : View.INVISIBLE);
+            ivTick.setVisibility(selectedFiles.contains(imageFile) ? View.VISIBLE : View.INVISIBLE);
         }
     }
 

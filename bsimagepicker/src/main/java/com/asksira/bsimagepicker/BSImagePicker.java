@@ -34,6 +34,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.io.File;
@@ -87,6 +88,11 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
         void onMultiImageSelected (List<Uri> uriList, String tag);
     }
     private OnMultiImageSelectedListener onMultiImageSelectedListener;
+    public interface ImageLoaderDelegate {
+        void loadImage(File imageFile, ImageView ivImage);
+    }
+
+    private ImageLoaderDelegate imageLoaderDelegate;
 
     //States
     private boolean isMultiSelection = false;
@@ -121,6 +127,12 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
         if (context instanceof OnMultiImageSelectedListener) {
             onMultiImageSelectedListener = (OnMultiImageSelectedListener) context;
         }
+        if (context instanceof ImageLoaderDelegate) {
+            imageLoaderDelegate = (ImageLoaderDelegate) context;
+        } else {
+            throw new RuntimeException(context.toString() + " must implement ImageLoaderDelegate");
+        }
+
     }
 
     @Override
@@ -382,10 +394,14 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
         recyclerView.setLayoutManager(gll);
         /* We are disabling item change animation because the default animation is fade out fade in, which will
          * appear a little bit strange due to the fact that we are darkening the cell at the same time. */
-        ((SimpleItemAnimator)recyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
+        ((SimpleItemAnimator) recyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
         recyclerView.addItemDecoration(new GridItemSpacingDecoration(spanCount, gridSpacing, false));
         if (adapter == null) {
-            adapter = new ImageTileAdapter(getContext(), isMultiSelection, showCameraTile, showGalleryTile);
+            adapter = new ImageTileAdapter(getContext(),
+                    imageLoaderDelegate,
+                    isMultiSelection,
+                    showCameraTile,
+                    showGalleryTile);
             adapter.setMaximumSelectionCount(maximumMultiSelectCount);
             adapter.setCameraTileOnClickListener(new View.OnClickListener() {
                 @Override
@@ -510,7 +526,7 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
         getContext().sendBroadcast(mediaScanIntent);
     }
 
-    private void updateSelectCount (int newCount) {
+    private void updateSelectCount(int newCount) {
         if (getContext() == null) return;
         if (tvMultiSelectMessage != null) {
             tvMultiSelectMessage.setTextColor(ContextCompat.getColor(getContext(), multiSelectTextColor));
@@ -530,7 +546,7 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
         }
     }
 
-    private void showOverSelectMessage () {
+    private void showOverSelectMessage() {
         if (tvMultiSelectMessage != null && getContext() != null) {
             tvMultiSelectMessage.setTextColor(ContextCompat.getColor(getContext(), overSelectTextColor));
             tvMultiSelectMessage.setText(getString(R.string.imagepicker_multiselect_overselect, maximumMultiSelectCount));
@@ -573,7 +589,7 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
             this.providerAuthority = providerAuthority;
         }
 
-        public Builder isMultiSelect () {
+        public Builder isMultiSelect() {
             isMultiSelect = true;
             return this;
         }
@@ -584,6 +600,7 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
         }
 
         public Builder setMaximumDisplayingImages (int maximumDisplayingImages) {
+
             this.maximumDisplayingImages = maximumDisplayingImages;
             return this;
         }
@@ -655,7 +672,7 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
             return this;
         }
 
-        public Builder disableOverSelectionMessage () {
+        public Builder disableOverSelectionMessage() {
             this.showOverSelectMessage = false;
             return this;
         }
