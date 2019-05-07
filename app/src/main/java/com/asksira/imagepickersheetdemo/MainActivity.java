@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.asksira.bsimagepicker.BSImagePicker;
 import com.bumptech.glide.Glide;
@@ -50,12 +51,12 @@ public class MainActivity extends AppCompatActivity implements BSImagePicker.OnS
     }
 
     @Override
-    public void onSingleImageSelected(Uri uri) {
+    public void onSingleImageSelected(Uri uri, String tag) {
         Glide.with(MainActivity.this).load(uri).into(ivImage2);
     }
 
     @Override
-    public void onMultiImageSelected(List<Uri> uriList) {
+    public void onMultiImageSelected(List<Uri> uriList, String tag) {
         for (int i=0; i < uriList.size(); i++) {
             if (i >= 6) return;
             ImageView iv;

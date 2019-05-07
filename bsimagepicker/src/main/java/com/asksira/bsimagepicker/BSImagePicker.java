@@ -71,20 +71,21 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
     //Views
     private RecyclerView recyclerView;
     private View bottomBarView;
-    private TextView tvDone, tvMultiSelectMessage;
+    private TextView tvDone, tvMultiSelectMessage, tvEmptyView;
 
     private BottomSheetBehavior bottomSheetBehavior;
 
     //Components
     private ImageTileAdapter adapter;
+    private String tag = "";
 
     //Callbacks
     public interface OnSingleImageSelectedListener {
-        void onSingleImageSelected(Uri uri);
+        void onSingleImageSelected(Uri uri, String tag);
     }
     private OnSingleImageSelectedListener onSingleImageSelectedListener;
     public interface OnMultiImageSelectedListener {
-        void onMultiImageSelected(List<Uri> uriList);
+        void onMultiImageSelected (List<Uri> uriList, String tag);
     }
     private OnMultiImageSelectedListener onMultiImageSelectedListener;
     public interface ImageLoaderDelegate {
@@ -95,6 +96,7 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
 
     //States
     private boolean isMultiSelection = false;
+    private boolean dismissOnSelect = true;
     private Uri currentPhotoUri;
 
     //Configurations
@@ -275,8 +277,8 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
                 if (resultCode == RESULT_OK) {
                     notifyGallery();
                     if (onSingleImageSelectedListener != null) {
-                        onSingleImageSelectedListener.onSingleImageSelected(currentPhotoUri);
-                        dismiss();
+                        onSingleImageSelectedListener.onSingleImageSelected(currentPhotoUri, tag);
+                        if (dismissOnSelect) dismiss();
                     }
                 } else {
                     try {
@@ -291,8 +293,8 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
             case REQUEST_SELECT_FROM_GALLERY:
                 if (resultCode == RESULT_OK) {
                     if (onSingleImageSelectedListener != null) {
-                        onSingleImageSelectedListener.onSingleImageSelected(data.getData());
-                        dismiss();
+                        onSingleImageSelectedListener.onSingleImageSelected(data.getData(), tag);
+                        if (dismissOnSelect) dismiss();
                     }
                 }
                 break;
@@ -333,6 +335,18 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
             cursor.moveToPosition(-1); //Restore cursor back to the beginning
             adapter.setImageList(uriList);
             //We are not closing the cursor here because Android Doc says Loader will manage them.
+
+            if (uriList.size() < 1 && !showCameraTile && !showGalleryTile) {
+                tvEmptyView.setVisibility(View.VISIBLE);
+                if (bottomBarView != null) {
+                    bottomBarView.setVisibility(View.GONE);
+                }
+            } else {
+                tvEmptyView.setVisibility(View.INVISIBLE);
+                if (bottomBarView != null) {
+                    bottomBarView.setVisibility(View.VISIBLE);
+                }
+            }
         }
     }
 
@@ -344,12 +358,19 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
     private void loadConfigFromBuilder() {
         try {
             providerAuthority = getArguments().getString("providerAuthority");
+            tag = getArguments().getString("tag");
             isMultiSelection = getArguments().getBoolean("isMultiSelect");
+            dismissOnSelect = getArguments().getBoolean("dismissOnSelect");
             maximumDisplayingImages = getArguments().getInt("maximumDisplayingImages");
             minimumMultiSelectCount = getArguments().getInt("minimumMultiSelectCount");
             maximumMultiSelectCount = getArguments().getInt("maximumMultiSelectCount");
-            showCameraTile = getArguments().getBoolean("showCameraTile");
-            showGalleryTile = getArguments().getBoolean("showGalleryTile");
+            if (isMultiSelection) {
+                showCameraTile = false;
+                showGalleryTile = false;
+            } else {
+                showCameraTile = getArguments().getBoolean("showCameraTile");
+                showGalleryTile = getArguments().getBoolean("showGalleryTile");
+            }
             spanCount = getArguments().getInt("spanCount");
             peekHeight = getArguments().getInt("peekHeight");
             gridSpacing = getArguments().getInt("gridSpacing");
@@ -365,6 +386,7 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
 
     private void bindViews(View rootView) {
         recyclerView = rootView.findViewById(R.id.picker_recyclerview);
+        tvEmptyView = rootView.findViewById(R.id.tv_picker_empty_view);
     }
 
     private void setupRecyclerView() {
@@ -408,8 +430,8 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
                 @Override
                 public void onClick(View v) {
                     if (v.getTag() != null && v.getTag() instanceof Uri && onSingleImageSelectedListener != null) {
-                        onSingleImageSelectedListener.onSingleImageSelected((Uri) v.getTag());
-                        dismiss();
+                        onSingleImageSelectedListener.onSingleImageSelected((Uri) v.getTag(), tag);
+                        if (dismissOnSelect) dismiss();
                     }
                 }
             });
@@ -435,7 +457,7 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
         CoordinatorLayout parentView = (CoordinatorLayout) (rootView.getParent().getParent());
         bottomBarView = LayoutInflater.from(getContext()).inflate(R.layout.item_picker_multiselection_bar, parentView, false);
         ViewCompat.setTranslationZ(bottomBarView, ViewCompat.getZ((View) rootView.getParent()));
-        parentView.addView(bottomBarView, -1);
+        parentView.addView(bottomBarView, -2);
         bottomBarView.findViewById(R.id.multiselect_bar_bg).setBackgroundColor(ContextCompat.getColor(getContext(), multiSelectBarBgColor));
         tvMultiSelectMessage = bottomBarView.findViewById(R.id.tv_multiselect_message);
         tvMultiSelectMessage.setTextColor(ContextCompat.getColor(getContext(), multiSelectTextColor));
@@ -448,7 +470,7 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
             @Override
             public void onClick(View v) {
                 if (onMultiImageSelectedListener != null) {
-                    onMultiImageSelectedListener.onMultiImageSelected(adapter.getSelectedUris());
+                    onMultiImageSelectedListener.onMultiImageSelected(adapter.getSelectedUris(), tag);
                     dismiss();
                 }
             }
@@ -532,13 +554,23 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
     }
 
     /**
+     * Returns the TextView that appears when there is no item,
+     * So that user can customize its styles, etc.
+     */
+    public TextView getEmptyTextView () {
+        return tvEmptyView;
+    }
+
+    /**
      * Builder of the BSImagePicker.
      * Caller should always create the dialog using this builder.
      */
     public static class Builder {
 
         private String providerAuthority;
+        private String tag;
         private boolean isMultiSelect;
+        private boolean dismissOnSelect = true;
         private int maximumDisplayingImages = Integer.MAX_VALUE;
         private int minimumMultiSelectCount = 1;
         private int maximumMultiSelectCount = Integer.MAX_VALUE;
@@ -562,7 +594,13 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
             return this;
         }
 
-        public Builder setMaximumDisplayingImages(int maximumDisplayingImages) {
+        public Builder dontDismissOnSelect() {
+            this.dismissOnSelect = false;
+            return this;
+        }
+
+        public Builder setMaximumDisplayingImages (int maximumDisplayingImages) {
+
             this.maximumDisplayingImages = maximumDisplayingImages;
             return this;
         }
@@ -593,6 +631,11 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
 
         public Builder setMultiSelectBarBgColor(@ColorRes int multiSelectBarBgColor) {
             this.multiSelectBarBgColor = multiSelectBarBgColor;
+            return this;
+        }
+
+        public Builder setTag(String tag) {
+            this.tag = tag;
             return this;
         }
 
@@ -645,7 +688,9 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
         public BSImagePicker build() {
             Bundle args = new Bundle();
             args.putString("providerAuthority", providerAuthority);
+            args.putString("tag", tag);
             args.putBoolean("isMultiSelect", isMultiSelect);
+            args.putBoolean("dismissOnSelect", dismissOnSelect);
             args.putInt("maximumDisplayingImages", maximumDisplayingImages);
             args.putInt("minimumMultiSelectCount", minimumMultiSelectCount);
             args.putInt("maximumMultiSelectCount", maximumMultiSelectCount);
