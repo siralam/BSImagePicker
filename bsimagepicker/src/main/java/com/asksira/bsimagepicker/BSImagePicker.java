@@ -82,10 +82,12 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
     //Callbacks
     public interface OnSingleImageSelectedListener {
         void onSingleImageSelected(Uri uri, String tag);
+        void onImagePickerCancelled(String tag);
     }
     private OnSingleImageSelectedListener onSingleImageSelectedListener;
     public interface OnMultiImageSelectedListener {
         void onMultiImageSelected (List<Uri> uriList, String tag);
+        void onImagePickerCancelled(String tag);
     }
     private OnMultiImageSelectedListener onMultiImageSelectedListener;
     public interface ImageLoaderDelegate {
@@ -199,6 +201,8 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
                                 case BottomSheetBehavior.STATE_HIDDEN:
                                     dismiss();
                                     break;
+                                default:
+                                    System.out.print("Default");
                             }
                         }
 
@@ -214,6 +218,17 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
         });
 
         return dialog;
+    }
+
+    @Override
+    public void onCancel(DialogInterface dialog) {
+        sendCancelledAction();
+        super.onCancel(dialog);
+    }
+
+    @Override
+    public void onDismiss(DialogInterface dialog) {
+        super.onDismiss(dialog);
     }
 
     /**
@@ -554,6 +569,13 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
             tvMultiSelectMessage.setTextColor(ContextCompat.getColor(getContext(), overSelectTextColor));
             tvMultiSelectMessage.setText(getString(R.string.imagepicker_multiselect_overselect, maximumMultiSelectCount));
         }
+    }
+
+    private void sendCancelledAction() {
+        if (onMultiImageSelectedListener != null)
+            onMultiImageSelectedListener.onImagePickerCancelled(tag);
+        else if (onSingleImageSelectedListener != null)
+            onSingleImageSelectedListener.onImagePickerCancelled(tag);
     }
 
     /**

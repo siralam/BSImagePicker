@@ -3,6 +3,7 @@ package com.asksira.imagepickersheetdemo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -53,6 +54,11 @@ public class MainActivity extends AppCompatActivity implements BSImagePicker.OnS
     @Override
     public void onSingleImageSelected(Uri uri, String tag) {
         Glide.with(MainActivity.this).load(uri).into(ivImage2);
+    }
+
+    @Override
+    public void onImagePickerCancelled(String tag) {
+        Log.d("BSImagePicker", "On Cancelled Method "+tag);
     }
 
     @Override
