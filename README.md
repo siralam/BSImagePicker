@@ -30,10 +30,9 @@ But there are still some defects that annoyed me:
 2. I don't like the design of his multiple selection mode;
 3. He query media files on the Main Thread. If you query all images in the device, that will absolutely block your app's response! I implemented using CursorLoader instead;
 4. He does not handle fragment lifecycle correctly. Quite some number of crashes due to referencing a null `Context` has been reported from my production apps, and his library cannot survive configuration change (e.g. device rotation);
-5. He is still using Glide v3 instead of v4.
-6. He hard-coded to use his own `FileProvider`, which will crash if your app has your own `FileProvider`.
+5. He hard-coded to use his own `FileProvider`, which will crash if your app has your own `FileProvider`.
 
-But note that `BSImagePicker` does not allow selection from camera and gallery when in multi selection mode, which is possible in `TedBottomPicker`, due to the difference in UIUX.  
+But note that `BSImagePicker` does not allow selection from camera and gallery when in multi selection mode, which is possible in `TedBottomPicker`, due to the difference in UI/UX.  
 Also, a recent release of `TedBottomPicker` also supports selecting vidoes. This is not supported by `BSImagePicker` as well.
 
 ## How to Use
@@ -55,7 +54,7 @@ allprojects {
 And then add the below to your app's build.gradle:  
 
 ```groovy
-    implementation 'com.asksira.android:bsimagepicker:1.1.0'
+    implementation 'com.asksira.android:bsimagepicker:1.2.1'
 ```
 
 You also need to make sure you have included `'com.android.support:support-v4:{supportLibraryVersion}` in your dependencies.
@@ -107,7 +106,8 @@ So, your caller Activity or Fragment must implements `OnSingleImageSelectedListe
 
 ```java
 public class MainActivity extends AppCompatActivity implements BSImagePicker.OnSingleImageSelectedListener,
-        BSImagePicker.OnMultiImageSelectedListener{
+        BSImagePicker.OnMultiImageSelectedListener,
+        BSImagePicker.ImageLoaderDelegate {
 
     //...
 
@@ -119,6 +119,13 @@ public class MainActivity extends AppCompatActivity implements BSImagePicker.OnS
     @Override
     public void onMultiImageSelected(List<Uri> uriList, String tag) {
         //Do something with your Uri list
+    }
+
+    @Override
+    public void loadImage(File imageFile, ImageView ivImage) {
+        //Glide is just an example. You can use any image loading library you want;
+        //This callback is to make sure the library has the flexibility to allow user to choose their own image loading method.
+        Glide.with(MainActivity.this).load(imageFile).into(ivImage);
     }
 }
 ```
@@ -172,6 +179,9 @@ You ask why don't I use plurals? [See this post](https://stackoverflow.com/quest
 2. Since the customization of layouts are done by resource overriding, it is impossible to set different style for different pickers in the same app. I consider this as an edge case.
 
 ## Release notes
+
+v.1.2.1
+- Caller Activity or Fragment now needs to implement ImageLoaderDelegate and provides its own way to load the image file into the file ImageView. This allows user to use any image loading library they want instead of binding to Glide v4.
 
 v1.1.0
 - Picker now supports a tag (String) as an identifier, so that you can identify which picker calls back your fragment / activity. This is useful if you need to launch more than 1 picker in the same fragment / activity. (Solves #3)
