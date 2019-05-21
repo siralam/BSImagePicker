@@ -53,8 +53,10 @@ allprojects {
 
 And then add the below to your app's build.gradle:  
 
+[ ![Download](https://api.bintray.com/packages/lsw19921030/maven/BSImagePicker/images/download.svg) ](https://bintray.com/lsw19921030/maven/BSImagePicker/_latestVersion)
+
 ```groovy
-    implementation 'com.asksira.android:bsimagepicker:1.2.2'
+    implementation 'com.asksira.android:bsimagepicker:{refer to the version badge above}}'
 ```
 
 You also need to make sure you have included `'com.android.support:support-v4:{supportLibraryVersion}` in your dependencies.
