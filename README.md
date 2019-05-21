@@ -180,6 +180,9 @@ You ask why don't I use plurals? [See this post](https://stackoverflow.com/quest
 
 ## Release notes
 
+v1.2.2
+- Fixed issue #32 because the imageLoaderDelegate is passed to the adapter before assigning nor throwing exceptions
+
 v.1.2.1
 - Caller Activity or Fragment now needs to implement ImageLoaderDelegate and provides its own way to load the image file into the file ImageView. This allows user to use any image loading library they want instead of binding to Glide v4.
 
