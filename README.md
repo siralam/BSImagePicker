@@ -54,7 +54,7 @@ allprojects {
 And then add the below to your app's build.gradle:  
 
 ```groovy
-    implementation 'com.asksira.android:bsimagepicker:1.2.1'
+    implementation 'com.asksira.android:bsimagepicker:1.2.2'
 ```
 
 You also need to make sure you have included `'com.android.support:support-v4:{supportLibraryVersion}` in your dependencies.
