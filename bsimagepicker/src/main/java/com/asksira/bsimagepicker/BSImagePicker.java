@@ -150,8 +150,6 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.layout_imagepicker_sheet, container, false);
-        bindViews(view);
-        setupRecyclerView();
         /*
          Here we check if the parent fragment has registered callback and reference it.
          */
@@ -175,6 +173,13 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
             throw new IllegalArgumentException("Your caller activity or parent fragment must implements ImageLoaderDelegate");
         }
         return view;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        bindViews(view);
+        setupRecyclerView();
     }
 
     /**
