@@ -11,6 +11,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.support.annotation.ColorRes;
 import android.support.annotation.NonNull;
@@ -67,6 +68,8 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
 
     private static final int REQUEST_TAKE_PHOTO = 3001;
     private static final int REQUEST_SELECT_FROM_GALLERY = 3002;
+
+    private ArrayList<Uri> selectedImages = new ArrayList<>();
 
     //Views
     private RecyclerView recyclerView;
@@ -230,8 +233,20 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
         if (isMultiSelection) {
             setupBottomBar(getView());
         }
+
+        // set preselected images
+        if (selectedImages != null) {
+            List<File> fileList = new ArrayList<>();
+            for (Uri each : selectedImages) {
+                File file = new File(URI.create(each.toString()));
+                fileList.add(file);
+            }
+            adapter.setSelectedFiles(fileList);
+        }
+
+        // restore selected images state
         if (savedInstanceState != null && adapter != null) {
-            List<Uri> savedUriList = savedInstanceState.getParcelableArrayList("selectedImages");
+            List<Uri> savedUriList = savedInstanceState.getParcelableArrayList("savedSelectedImages");
             if (savedUriList != null) {
                 List<File> fileList = new ArrayList<>();
                 for (Uri each : savedUriList) {
@@ -314,7 +329,7 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelableArrayList("selectedImages", (ArrayList<Uri>) adapter.getSelectedUris());
+        outState.putParcelableArrayList("savedSelectedImages", (ArrayList<Uri>) adapter.getSelectedUris());
         outState.putParcelable("currentPhotoUri", currentPhotoUri);
     }
 
@@ -387,6 +402,7 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
             multiSelectDoneTextColor = getArguments().getInt("multiSelectDoneTextColor");
             showOverSelectMessage = getArguments().getBoolean("showOverSelectMessage");
             overSelectTextColor = getArguments().getInt("overSelectTextColor");
+            selectedImages = getArguments().getParcelableArrayList("selectedImages");
         } catch (Exception e) {
             if (BuildConfig.DEBUG) e.printStackTrace();
         }
@@ -592,6 +608,7 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
         private int multiSelectDoneTextColor = R.color.multiselect_done;
         private boolean showOverSelectMessage = true;
         private int overSelectTextColor = R.color.error_text;
+        private ArrayList<Uri> selectedImages = new ArrayList<>();
 
         public Builder(String providerAuthority) {
             this.providerAuthority = providerAuthority;
@@ -712,11 +729,16 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
             args.putInt("multiSelectDoneTextColor", multiSelectDoneTextColor);
             args.putBoolean("showOverSelectMessage", showOverSelectMessage);
             args.putInt("overSelectTextColor", overSelectTextColor);
+            args.putParcelableArrayList("selectedImages", new ArrayList<Parcelable>(selectedImages));
 
             BSImagePicker fragment = new BSImagePicker();
             fragment.setArguments(args);
             return fragment;
         }
 
+        public Builder setSelectedImages(List<Uri> uriList) {
+            selectedImages = new ArrayList(uriList);
+            return this;
+        }
     }
 }
