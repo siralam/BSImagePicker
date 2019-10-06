@@ -115,7 +115,7 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
     private int multiSelectDoneTextColor = R.color.multiselect_done;
     private boolean showOverSelectMessage = true;
     private int overSelectTextColor = R.color.error_text;
-    private ArrayList<Uri> selectedImages = new ArrayList();
+    private ArrayList<Uri> selectedImages = new ArrayList<>();
 
     /**
      * Here we check if the caller Activity has registered callback and reference it.
@@ -235,14 +235,12 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
 
         // set preselected images
         if (selectedImages != null) {
-            if (selectedImages != null) {
-                List<File> fileList = new ArrayList<>();
-                for (Uri each : selectedImages) {
-                    File file = new File(URI.create(each.toString()));
-                    fileList.add(file);
-                }
-                adapter.setSelectedFiles(fileList);
+            List<File> fileList = new ArrayList<>();
+            for (Uri each : selectedImages) {
+                File file = new File(URI.create(each.toString()));
+                fileList.add(file);
             }
+            adapter.setSelectedFiles(fileList);
         }
 
         // restore selected images state
