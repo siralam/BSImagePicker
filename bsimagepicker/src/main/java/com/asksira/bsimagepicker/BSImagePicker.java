@@ -69,6 +69,8 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
     private static final int REQUEST_TAKE_PHOTO = 3001;
     private static final int REQUEST_SELECT_FROM_GALLERY = 3002;
 
+    private ArrayList<Uri> selectedImages = new ArrayList<>();
+
     //Views
     private RecyclerView recyclerView;
     private View bottomBarView;
@@ -115,7 +117,6 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
     private int multiSelectDoneTextColor = R.color.multiselect_done;
     private boolean showOverSelectMessage = true;
     private int overSelectTextColor = R.color.error_text;
-    private ArrayList<Uri> selectedImages = new ArrayList<>();
 
     /**
      * Here we check if the caller Activity has registered callback and reference it.
