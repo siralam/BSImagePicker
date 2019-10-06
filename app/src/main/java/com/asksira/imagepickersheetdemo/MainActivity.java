@@ -5,18 +5,19 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.asksira.bsimagepicker.BSImagePicker;
 import com.bumptech.glide.Glide;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements BSImagePicker.OnSingleImageSelectedListener,
         BSImagePicker.OnMultiImageSelectedListener, BSImagePicker.ImageLoaderDelegate{
 
     private ImageView ivImage1, ivImage2, ivImage3, ivImage4, ivImage5, ivImage6;
+    private List<Uri> selectedImages = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,8 +43,9 @@ public class MainActivity extends AppCompatActivity implements BSImagePicker.OnS
                 BSImagePicker pickerDialog = new BSImagePicker.Builder("com.asksira.imagepickersheetdemo.fileprovider")
                         .setMaximumDisplayingImages(Integer.MAX_VALUE)
                         .isMultiSelect()
-                        .setMinimumMultiSelectCount(3)
+                        .setMinimumMultiSelectCount(1)
                         .setMaximumMultiSelectCount(6)
+                        .setSelectedImages(selectedImages)
                         .build();
                 pickerDialog.show(getSupportFragmentManager(), "picker");
             }
@@ -57,6 +59,7 @@ public class MainActivity extends AppCompatActivity implements BSImagePicker.OnS
 
     @Override
     public void onMultiImageSelected(List<Uri> uriList, String tag) {
+        selectedImages = uriList;
         for (int i=0; i < uriList.size(); i++) {
             if (i >= 6) return;
             ImageView iv;
