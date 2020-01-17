@@ -3,6 +3,9 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/BSImagePicker.iml" filepath="$PROJECT_DIR$/BSImagePicker.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/BSImagePicker-app.iml" filepath="$PROJECT_DIR$/app/BSImagePicker-app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/bsimagepicker/BSImagePicker-bsimagepicker.iml" filepath="$PROJECT_DIR$/bsimagepicker/BSImagePicker-bsimagepicker.iml" />
+      <module fileurl="file://$PROJECT_DIR$/HistoricalProjects-BSImagePicker.iml" filepath="$PROJECT_DIR$/HistoricalProjects-BSImagePicker.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/bsimagepicker/bsimagepicker.iml" filepath="$PROJECT_DIR$/bsimagepicker/bsimagepicker.iml" />
     </modules>

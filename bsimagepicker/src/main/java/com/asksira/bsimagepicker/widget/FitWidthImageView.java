@@ -11,7 +11,7 @@ import com.asksira.bsimagepicker.R;
  * This does not work if height is match_parent.
  */
 
-public class FitWidthImageView extends android.support.v7.widget.AppCompatImageView {
+public class FitWidthImageView extends androidx.appcompat.widget.AppCompatImageView {
 
     /**
      * Aspect ratio is calculated by width / height.
