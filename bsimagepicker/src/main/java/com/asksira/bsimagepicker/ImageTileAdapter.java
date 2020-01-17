@@ -25,9 +25,9 @@ public class ImageTileAdapter extends RecyclerView.Adapter<ImageTileAdapter.Base
     private static final int VIEWTYPE_BOTTOM_SPACE = 105;
 
     protected Context context;
-    protected List<File> imageList;
+    protected List<Uri> imageList;
     protected boolean isMultiSelect;
-    protected List<File> selectedFiles;
+    protected List<Uri> selectedFiles;
     protected int maximumSelectionCount = Integer.MAX_VALUE;
     protected int nonListItemCount;
     private boolean showCameraTile;
@@ -132,22 +132,14 @@ public class ImageTileAdapter extends RecyclerView.Adapter<ImageTileAdapter.Base
         }
     }
 
-    public void setSelectedFiles(List<File> selectedFiles) {
+    public void setSelectedFiles(List<Uri> selectedFiles) {
         this.selectedFiles = selectedFiles;
         notifyDataSetChanged();
         if (onSelectedCountChangeListener != null)
             onSelectedCountChangeListener.onSelectedCountChange(selectedFiles.size());
     }
 
-    public List<Uri> getSelectedUris() {
-        List<Uri> result = new ArrayList<>();
-        for (File each : selectedFiles) {
-            result.add(Uri.fromFile(each));
-        }
-        return result;
-    }
-
-    public void setImageList(List<File> imageList) {
+    public void setImageList(List<Uri> imageList) {
         this.imageList = imageList;
         notifyDataSetChanged();
     }
@@ -228,7 +220,7 @@ public class ImageTileAdapter extends RecyclerView.Adapter<ImageTileAdapter.Base
                 itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        File thisFile = imageList.get(getAdapterPosition());
+                        Uri thisFile = imageList.get(getAdapterPosition());
                         if (selectedFiles.contains(thisFile)) {
                             selectedFiles.remove(thisFile);
                             notifyItemChanged(getAdapterPosition());
@@ -252,8 +244,8 @@ public class ImageTileAdapter extends RecyclerView.Adapter<ImageTileAdapter.Base
 
         public void bind(int position) {
             if (imageList == null) return;
-            File imageFile = imageList.get(position - nonListItemCount);
-            itemView.setTag(Uri.fromFile(imageFile));
+            Uri imageFile = imageList.get(position - nonListItemCount);
+            itemView.setTag(imageFile);
             imageLoaderDelegate.loadImage(imageFile, ivImage);
             darken.setVisibility(selectedFiles.contains(imageFile) ? View.VISIBLE : View.INVISIBLE);
             ivTick.setVisibility(selectedFiles.contains(imageFile) ? View.VISIBLE : View.INVISIBLE);

@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity implements BSImagePicker.OnS
     }
 
     @Override
-    public void loadImage(File imageFile, ImageView ivImage) {
-        Glide.with(MainActivity.this).load(imageFile).into(ivImage);
+    public void loadImage(Uri imageUri, ImageView ivImage) {
+        Glide.with(MainActivity.this).load(imageUri).into(ivImage);
     }
 }

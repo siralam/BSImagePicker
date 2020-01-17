@@ -89,7 +89,7 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
     }
     private OnMultiImageSelectedListener onMultiImageSelectedListener;
     public interface ImageLoaderDelegate {
-        void loadImage(File imageFile, ImageView ivImage);
+        void loadImage(Uri imageUri, ImageView ivImage);
     }
 
     private ImageLoaderDelegate imageLoaderDelegate;
@@ -137,7 +137,7 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
         super.onCreate(savedInstanceState);
         loadConfigFromBuilder();
         if (Utils.isReadStorageGranted(getContext())) {
-            getLoaderManager().initLoader(LOADER_ID, null, BSImagePicker.this);
+            LoaderManager.getInstance(this).initLoader(LOADER_ID, null, BSImagePicker.this);
         } else {
             Utils.checkPermission(BSImagePicker.this, Manifest.permission.READ_EXTERNAL_STORAGE, PERMISSION_READ_STORAGE);
         }
@@ -233,12 +233,7 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
         if (savedInstanceState != null && adapter != null) {
             List<Uri> savedUriList = savedInstanceState.getParcelableArrayList("selectedImages");
             if (savedUriList != null) {
-                List<File> fileList = new ArrayList<>();
-                for (Uri each : savedUriList) {
-                    File file = new File(URI.create(each.toString()));
-                    fileList.add(file);
-                }
-                adapter.setSelectedFiles(fileList);
+                adapter.setSelectedFiles(savedUriList);
             }
         }
     }
@@ -314,7 +309,7 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelableArrayList("selectedImages", (ArrayList<Uri>) adapter.getSelectedUris());
+        outState.putParcelableArrayList("selectedImages", (ArrayList<Uri>) adapter.selectedFiles);
         outState.putParcelable("currentPhotoUri", currentPhotoUri);
     }
 
@@ -322,7 +317,7 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         if (id == LOADER_ID && getContext() != null) {
             Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-            String[] projection = new String[]{MediaStore.Images.Media.DATA};
+            String[] projection = new String[]{MediaStore.Images.Media._ID};
             String sortOrder = MediaStore.Images.Media.DATE_ADDED + " DESC";
             return new CursorLoader(getContext(), uri, projection, null, null, sortOrder);
         } else {
@@ -333,11 +328,12 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         if (cursor != null) {
-            List<File> uriList = new ArrayList<>();
+            List<Uri> uriList = new ArrayList<>();
             int index = 0;
             while (cursor.moveToNext() && index < maximumDisplayingImages) {
-                String imagePath = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
-                uriList.add(new File(imagePath));
+                int id = cursor.getInt(cursor.getColumnIndex(MediaStore.Images.Media._ID));
+                Uri baseUri = Uri.parse("content://media/external/images/media");
+                uriList.add(Uri.withAppendedPath(baseUri, ""+id));
                 index++;
             }
             cursor.moveToPosition(-1); //Restore cursor back to the beginning
@@ -478,7 +474,7 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
             @Override
             public void onClick(View v) {
                 if (onMultiImageSelectedListener != null) {
-                    onMultiImageSelectedListener.onMultiImageSelected(adapter.getSelectedUris(), tag);
+                    onMultiImageSelectedListener.onMultiImageSelected(adapter.selectedFiles, tag);
                     dismiss();
                 }
             }
@@ -515,7 +511,8 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
     private File createImageFile() throws IOException {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime());
         String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
+        File storageDir = getContext().getExternalFilesDir(Environment.DIRECTORY_DCIM);
+//        File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
         File image = File.createTempFile(
                 imageFileName,  /* prefix */
                 ".jpg",   /* suffix */
