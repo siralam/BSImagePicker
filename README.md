@@ -190,6 +190,9 @@ You ask why don't I use plurals? [See this post](https://stackoverflow.com/quest
 
 ## Release notes
 
+v1.3.0
+- Changed support libraries to AndroidX
+
 v1.2.2
 - Fixed issue #32 because the imageLoaderDelegate is passed to the adapter before assigning nor throwing exceptions
 
