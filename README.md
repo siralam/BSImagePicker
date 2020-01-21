@@ -148,6 +148,14 @@ If you called from a Fragment:
        pickerDialog.show(getChildFragmentManager(), "picker");
 ```
 
+## Android Q Scoped Storage issue
+
+If you target Android SDK Version 29 or higher, you will encounter the problem brought by scoped storage.  
+This library assumes you will just add `android:requestLegacyExternalStorage="true"` to your `<application>` tag in AndroidManifest.xml.
+
+If you want to stick with the scoped storage approach, i.e. do not want to add that legacy attribute, you can consider forking the library and change the code yourself.  
+Or I would appreciate your help by suggesting in [issue #33](https://github.com/siralam/BSImagePicker/issues/33).
+
 ## Customization of layouts
 
 You can easily customize various layouts and string resources by simply overriding the original resource I defined in the library.
