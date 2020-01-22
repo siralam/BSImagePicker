@@ -120,6 +120,7 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
     private int multiSelectDoneTextColor = R.color.multiselect_done;
     private boolean showOverSelectMessage = true;
     private int overSelectTextColor = R.color.error_text;
+    private boolean isOpenFrontCamera = false;
 
     /**
      * Here we check if the caller Activity has registered callback and reference it.
@@ -403,6 +404,7 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
             multiSelectDoneTextColor = getArguments().getInt("multiSelectDoneTextColor");
             showOverSelectMessage = getArguments().getBoolean("showOverSelectMessage");
             overSelectTextColor = getArguments().getInt("overSelectTextColor");
+            isOpenFrontCamera = getArguments().getBoolean("isOpenFrontCamera");
         } catch (Exception e) {
             if (BuildConfig.DEBUG) e.printStackTrace();
         }
@@ -518,6 +520,13 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
                         providerAuthority,
                         photoFile);
                 takePhotoIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                if (isOpenFrontCamera) {
+                    //Below does not always work, just a hack.
+                    //Reference: https://stackoverflow.com/a/40175503/7870874
+                    takePhotoIntent.putExtra("android.intent.extras.CAMERA_FACING", android.hardware.Camera.CameraInfo.CAMERA_FACING_FRONT);
+                    takePhotoIntent.putExtra("android.intent.extras.LENS_FACING_FRONT", 1);
+                    takePhotoIntent.putExtra("android.intent.extra.USE_FRONT_CAMERA", true);
+                }
                 List<ResolveInfo> resolvedIntentActivities = getContext().getPackageManager().queryIntentActivities(takePhotoIntent, PackageManager.MATCH_DEFAULT_ONLY);
                 for (ResolveInfo resolvedIntentInfo : resolvedIntentActivities) {
                     String packageName = resolvedIntentInfo.activityInfo.packageName;
@@ -609,6 +618,7 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
         private int multiSelectDoneTextColor = R.color.multiselect_done;
         private boolean showOverSelectMessage = true;
         private int overSelectTextColor = R.color.error_text;
+        private boolean isOpenFrontCamera = false;
 
         public Builder(String providerAuthority) {
             this.providerAuthority = providerAuthority;
@@ -710,6 +720,11 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
             return this;
         }
 
+        public Builder useFrontCamera() {
+            this.isOpenFrontCamera = true;
+            return this;
+        }
+
         public BSImagePicker build() {
             Bundle args = new Bundle();
             args.putString("providerAuthority", providerAuthority);
@@ -729,6 +744,7 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
             args.putInt("multiSelectDoneTextColor", multiSelectDoneTextColor);
             args.putBoolean("showOverSelectMessage", showOverSelectMessage);
             args.putInt("overSelectTextColor", overSelectTextColor);
+            args.putBoolean("isOpenFrontCamera", isOpenFrontCamera);
 
             BSImagePicker fragment = new BSImagePicker();
             fragment.setArguments(args);
