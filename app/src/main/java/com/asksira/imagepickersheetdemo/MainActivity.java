@@ -2,18 +2,19 @@ package com.asksira.imagepickersheetdemo;
 
 import android.net.Uri;
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.asksira.bsimagepicker.BSImagePicker;
 import com.bumptech.glide.Glide;
 
-import java.io.File;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements BSImagePicker.OnSingleImageSelectedListener,
-        BSImagePicker.OnMultiImageSelectedListener, BSImagePicker.ImageLoaderDelegate{
+        BSImagePicker.OnMultiImageSelectedListener, BSImagePicker.ImageLoaderDelegate, BSImagePicker.OnSelectImageCancelledListener {
 
     private ImageView ivImage1, ivImage2, ivImage3, ivImage4, ivImage5, ivImage6;
 
@@ -86,5 +87,10 @@ public class MainActivity extends AppCompatActivity implements BSImagePicker.OnS
     @Override
     public void loadImage(Uri imageUri, ImageView ivImage) {
         Glide.with(MainActivity.this).load(imageUri).into(ivImage);
+    }
+
+    @Override
+    public void onCancelled(boolean isMultiSelecting) {
+        Toast.makeText(this, "Selection is cancelled, Multi-selection is " + isMultiSelecting, Toast.LENGTH_SHORT).show();
     }
 }

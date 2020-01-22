@@ -12,23 +12,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import androidx.annotation.ColorRes;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.Px;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
-import com.google.android.material.bottomsheet.BottomSheetDialog;
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import androidx.loader.app.LoaderManager;
-import androidx.core.content.ContextCompat;
-import androidx.loader.content.CursorLoader;
-import androidx.core.content.FileProvider;
-import androidx.loader.content.Loader;
-import androidx.core.view.ViewCompat;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.SimpleItemAnimator;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,6 +19,25 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.annotation.ColorRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.Px;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
+import androidx.core.view.ViewCompat;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.CursorLoader;
+import androidx.loader.content.Loader;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.SimpleItemAnimator;
+
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import java.io.File;
 import java.io.IOException;
@@ -91,6 +93,10 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
     public interface ImageLoaderDelegate {
         void loadImage(Uri imageUri, ImageView ivImage);
     }
+    private OnSelectImageCancelledListener onSelectImageCancelledListener;
+    public interface OnSelectImageCancelledListener {
+        void onCancelled(boolean isMultiSelecting);
+    }
 
     private ImageLoaderDelegate imageLoaderDelegate;
 
@@ -130,6 +136,9 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
         if (context instanceof ImageLoaderDelegate) {
             imageLoaderDelegate = (ImageLoaderDelegate) context;
         }
+        if (context instanceof OnSelectImageCancelledListener) {
+            onSelectImageCancelledListener = (OnSelectImageCancelledListener) context;
+        }
     }
 
     @Override
@@ -161,6 +170,9 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
         }
         if (getParentFragment() != null && getParentFragment() instanceof ImageLoaderDelegate) {
             imageLoaderDelegate = (ImageLoaderDelegate) getParentFragment();
+        }
+        if (getParentFragment() != null && getParentFragment() instanceof OnSelectImageCancelledListener) {
+            onSelectImageCancelledListener = (OnSelectImageCancelledListener) getParentFragment();
         }
         /*
          If no correct callback is registered, throw an exception.
@@ -219,6 +231,14 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
         });
 
         return dialog;
+    }
+
+    @Override
+    public void onCancel(@NonNull DialogInterface dialog) {
+        super.onCancel(dialog);
+        if (onSelectImageCancelledListener != null) {
+            onSelectImageCancelledListener.onCancelled(isMultiSelection);
+        }
     }
 
     /**
