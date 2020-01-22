@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements BSImagePicker.OnS
     }
 
     @Override
-    public void onCancelled(boolean isMultiSelecting) {
+    public void onCancelled(boolean isMultiSelecting, String tag) {
         Toast.makeText(this, "Selection is cancelled, Multi-selection is " + isMultiSelecting, Toast.LENGTH_SHORT).show();
     }
 }

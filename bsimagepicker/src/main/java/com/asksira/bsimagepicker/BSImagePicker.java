@@ -95,7 +95,7 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
     }
     private OnSelectImageCancelledListener onSelectImageCancelledListener;
     public interface OnSelectImageCancelledListener {
-        void onCancelled(boolean isMultiSelecting);
+        void onCancelled(boolean isMultiSelecting, String tag);
     }
 
     private ImageLoaderDelegate imageLoaderDelegate;
@@ -238,7 +238,7 @@ public class BSImagePicker extends BottomSheetDialogFragment implements LoaderMa
     public void onCancel(@NonNull DialogInterface dialog) {
         super.onCancel(dialog);
         if (onSelectImageCancelledListener != null) {
-            onSelectImageCancelledListener.onCancelled(isMultiSelection);
+            onSelectImageCancelledListener.onCancelled(isMultiSelection, tag);
         }
     }
 
