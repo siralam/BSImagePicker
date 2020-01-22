@@ -83,6 +83,7 @@ Single Selection:
                .hideGalleryTile() //Default: show. Set this if you don't want to further let user select from a gallery app. In such case, I suggest you to set maximum displaying images to Integer.MAX_VALUE.
                .setTag("A request ID") //Default: null. Set this if you need to identify which picker is calling back your fragment / activity.
                .dismissOnSelect(true) //Default: true. Set this if you do not want the picker to dismiss right after selection. But then you will have to dismiss by yourself.
+               .useFrontCamera(true) //Default: false. Launching camera by intent has no reliable way to open front camera so this does not always work.
                .build();
 ```
 
@@ -109,7 +110,8 @@ So, your caller Activity or Fragment must implements `OnSingleImageSelectedListe
 ```java
 public class MainActivity extends AppCompatActivity implements BSImagePicker.OnSingleImageSelectedListener,
         BSImagePicker.OnMultiImageSelectedListener,
-        BSImagePicker.ImageLoaderDelegate {
+        BSImagePicker.ImageLoaderDelegate,
+        BSImagePicker.OnSelectImageCancelledListener {
 
     //...
 
@@ -128,6 +130,12 @@ public class MainActivity extends AppCompatActivity implements BSImagePicker.OnS
         //Glide is just an example. You can use any image loading library you want;
         //This callback is to make sure the library has the flexibility to allow user to choose their own image loading method.
         Glide.with(MainActivity.this).load(imageFile).into(ivImage);
+    }
+
+    //Optional
+    @Override
+    public void onCancelled(boolean isMultiSelecting, String tag) {
+        //Do whatever you want when user cancelled
     }
 }
 ```
@@ -189,6 +197,10 @@ You ask why don't I use plurals? [See this post](https://stackoverflow.com/quest
 2. Since the customization of layouts are done by resource overriding, it is impossible to set different style for different pickers in the same app. I consider this as an edge case.
 
 ## Release notes
+
+v1.3.2
+- Added cancel callback
+- Added front facing camera option, but it is just a hack so does not always work.
 
 v1.3.0
 - Changed support libraries to AndroidX
