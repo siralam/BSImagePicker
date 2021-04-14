@@ -7,6 +7,17 @@ BS stands for [BottomSheet](https://developer.android.com/reference/android/supp
 <img src="demoImages/multiSelection.png" alt="Multi Selection Demo" width="360" />
 </p>
 
+## Deprecated (Since April 2021)
+
+I am not maintaining this library anymore, let me explain why.
+
+Some of the assumptions I made when building this library, I now consider them wrong or invalid. For example, showing camera tile on multiple selection has been a valid and common use case but not supported; it is also common for apps to implement their own permission control UI as well so dedicating it to the library was actually a bad idea.
+
+Besides, this repository has successfully gain the attention of the author of [TedBottomPicker](https://github.com/ParkSangGwon/TedBottomPicker), which was the reference of this library and improving it was the reason why I tried to make this one. I find that the author has continuous updates and may be he has solved some problems I mentioned in the past.
+
+So, instead of contributing to this library, may be submitting pull requests there or even forking from it will be a better choice.
+
+
 ## Why this library?
 
 When your app needs user to pick one or more images from their device, it is still quite painful in Android.  
